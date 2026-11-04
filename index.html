@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0f0a0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="See a Diwali painting appear on a real canvas, right in your browser.">
+<title>AR Diwali Canvas</title>
+<link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="modulepreload" href="/js/app.js">
+<script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<!-- WELCOME -->
+<section id="welcome" class="screen fade-in" hidden>
+  <div class="welcome-hero">
+    <div class="welcome-art">
+      <div class="glow"></div>
+      <div class="frame"><img id="hero-img" alt="" src="/paintings/traditional-1/preview.jpg"></div>
+    </div>
+    <div class="brand"><img src="/img/logo.svg" alt=""><span>AR Diwali Canvas</span></div>
+    <h1 class="title">Turn an empty canvas into <em>Diwali&nbsp;light</em></h1>
+    <p class="lede">Point your phone at the canvas frame and watch a hand-painted Diwali artwork appear on it. No app needed.</p>
+    <div class="chip-row" id="canvas-chip"></div>
+    <div class="actions">
+      <button class="btn primary block" id="btn-start">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+        Start AR Experience
+      </button>
+      <button class="btn block" id="btn-gallery">Explore the gallery</button>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1</b>Allow the camera</div>
+      <div class="step"><b>2</b>Point at the canvas</div>
+      <div class="step"><b>3</b>Swap paintings live</div>
+    </div>
+  </div>
+  <p class="foot-note" id="demo-note" hidden>Demo mode — no canvas nearby? Open the <a href="/api/canvas/demo/print.svg" target="_blank" rel="noopener">demo tracking print</a> on another screen and point your phone at it.</p>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="screen" hidden>
+  <header class="topbar">
+    <div class="topbar-row">
+      <button class="icon-btn" id="gallery-back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <h2>Diwali Gallery</h2>
+    </div>
+    <nav class="cats" id="cats" aria-label="Categories"></nav>
+  </header>
+  <div class="grid" id="grid" role="listbox" aria-label="Paintings"></div>
+  <div class="dock">
+    <div class="dock-inner">
+      <img id="dock-img" alt="">
+      <div class="sel"><small>Selected</small><div id="dock-title"></div></div>
+      <button class="btn primary" id="dock-start">Start AR</button>
+    </div>
+  </div>
+</section>
+
+<!-- AR -->
+<section id="ar" class="screen" hidden>
+  <div id="ar-stage"></div>
+  <div class="scan-guide" id="scan-guide"><div class="scan-box"><i></i><i></i><i></i><i></i></div></div>
+  <div class="ar-ui">
+    <div class="ar-top">
+      <div class="status" id="status"><span class="dot"></span><span id="status-text">Starting camera…</span></div>
+      <button class="icon-btn" id="ar-exit" aria-label="Exit AR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="toast" id="toast"></div>
+    <div class="scan-text" id="scan-text"><b>Point your camera at the canvas</b><span>Fit the whole frame on screen, about 1.5–3 m away.</span></div>
+    <div class="ar-bottom">
+      <button class="icon-btn" id="ar-reset" aria-label="Reset tracking" title="Reset tracking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <button class="fab" id="ar-pick"><img id="fab-img" alt=""><span>Paintings</span></button>
+      <button class="icon-btn" id="ar-info" aria-label="Painting info" title="About this painting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+    </div>
+    <div class="calib" id="calib" hidden></div>
+  </div>
+  <div class="loading-veil" id="veil">
+    <div class="loader">
+      <svg class="flame-spin" viewBox="0 0 64 64"><defs><radialGradient id="lf" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fffbe8"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#ff7a1a"/></radialGradient></defs><path d="M32 58 C14 44 22 24 32 6 C42 24 50 44 32 58Z" fill="url(#lf)"><animateTransform attributeName="transform" type="scale" values="1 1;0.94 1.05;1 1" dur="1.2s" repeatCount="indefinite" additive="sum"/></path></svg>
+      <div id="veil-text">Preparing the canvas…</div>
+      <div class="progress"><i></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- MESSAGE (errors / permission help) -->
+<section id="message" class="screen" hidden><div class="msg"><div class="box" id="message-box"></div></div></section>
+
+<!-- Sheets -->
+<div class="sheet-backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet-detail" role="dialog" aria-modal="true"><div class="grab"></div><div class="detail" id="detail"></div></div>
+<div class="sheet" id="sheet-picker" role="dialog" aria-modal="true" aria-label="Choose a painting"><div class="grab"></div>
+  <div class="picker-cats" id="picker-cats"></div>
+  <div class="picker" id="picker"></div>
+</div>
+
+<noscript><div class="msg"><div class="box"><h2>JavaScript required</h2><p>Please enable JavaScript to use AR Diwali Canvas.</p></div></div></noscript>
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
