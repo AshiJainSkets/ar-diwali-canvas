@@ -1,0 +1,388 @@
+{
+ "version": 1,
+ "canvasAspect": "4:3",
+ "categories": [
+  {
+   "id": "traditional",
+   "name": "Traditional Diwali Celebration",
+   "description": "Homes, lamps and fireworks on the night of Amavasya."
+  },
+  {
+   "id": "rangoli",
+   "name": "Diwali Rangoli Art",
+   "description": "Radiant floor art of petals, powders and dots."
+  },
+  {
+   "id": "lakshmi",
+   "name": "Goddess Lakshmi Inspired",
+   "description": "Lotus, gold and footsteps of prosperity."
+  },
+  {
+   "id": "ganesha",
+   "name": "Lord Ganesha Artwork",
+   "description": "Vighnaharta, remover of obstacles, in line and light."
+  },
+  {
+   "id": "diya",
+   "name": "Diya & Floral Decorations",
+   "description": "Clay lamps, marigolds and flowing petals."
+  },
+  {
+   "id": "heritage",
+   "name": "Indian Heritage Diwali",
+   "description": "Ghats, temples and forts aglow."
+  },
+  {
+   "id": "rajasthani",
+   "name": "Royal Rajasthani Diwali",
+   "description": "Palaces, jharokhas and caparisoned elephants."
+  },
+  {
+   "id": "abstract",
+   "name": "Modern Abstract Diwali",
+   "description": "Contemporary colour fields and geometry of flame."
+  },
+  {
+   "id": "folk",
+   "name": "Traditional Indian Folk Art",
+   "description": "Warli, Madhubani and Gond interpretations."
+  },
+  {
+   "id": "gold",
+   "name": "Luxury Gold Diwali",
+   "description": "Gilded mandalas, emerald and gold leaf."
+  }
+ ],
+ "paintings": [
+  {
+   "id": "traditional-1",
+   "category": "traditional",
+   "title": "Festival of Lights at the Haveli",
+   "description": "A haveli lined with diyas under a sky of fireworks.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/traditional-1/albedo.jpg",
+   "height": "/paintings/traditional-1/height.jpg",
+   "preview": "/paintings/traditional-1/preview.jpg",
+   "thumb": "/paintings/traditional-1/thumb.jpg"
+  },
+  {
+   "id": "traditional-2",
+   "category": "traditional",
+   "title": "Diyas on the Doorstep",
+   "description": "A garlanded doorway welcoming the goddess with rangoli and lamps.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/traditional-2/albedo.jpg",
+   "height": "/paintings/traditional-2/height.jpg",
+   "preview": "/paintings/traditional-2/preview.jpg",
+   "thumb": "/paintings/traditional-2/thumb.jpg"
+  },
+  {
+   "id": "traditional-3",
+   "category": "traditional",
+   "title": "Lanterns over the Rooftops",
+   "description": "Sky lanterns drift over a sleeping town ringed with light.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/traditional-3/albedo.jpg",
+   "height": "/paintings/traditional-3/height.jpg",
+   "preview": "/paintings/traditional-3/preview.jpg",
+   "thumb": "/paintings/traditional-3/thumb.jpg"
+  },
+  {
+   "id": "rangoli-1",
+   "category": "rangoli",
+   "title": "Lotus Mandala Rangoli",
+   "description": "A sixteen-lamp rangoli on a terracotta courtyard.",
+   "medium": "Textured acrylic",
+   "albedo": "/paintings/rangoli-1/albedo.jpg",
+   "height": "/paintings/rangoli-1/height.jpg",
+   "preview": "/paintings/rangoli-1/preview.jpg",
+   "thumb": "/paintings/rangoli-1/thumb.jpg"
+  },
+  {
+   "id": "rangoli-2",
+   "category": "rangoli",
+   "title": "Peacock Rangoli",
+   "description": "Peacocks guard a jewel-toned rangoli strewn with petals.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/rangoli-2/albedo.jpg",
+   "height": "/paintings/rangoli-2/height.jpg",
+   "preview": "/paintings/rangoli-2/preview.jpg",
+   "thumb": "/paintings/rangoli-2/thumb.jpg"
+  },
+  {
+   "id": "rangoli-3",
+   "category": "rangoli",
+   "title": "Kolam Garden",
+   "description": "Interlacing rangolis framed by a dotted kolam border.",
+   "medium": "Gouache-style acrylic",
+   "albedo": "/paintings/rangoli-3/albedo.jpg",
+   "height": "/paintings/rangoli-3/height.jpg",
+   "preview": "/paintings/rangoli-3/preview.jpg",
+   "thumb": "/paintings/rangoli-3/thumb.jpg"
+  },
+  {
+   "id": "lakshmi-1",
+   "category": "lakshmi",
+   "title": "Lakshmi's Lotus",
+   "description": "A radiant lotus rises as gold coins fall like blessings.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/lakshmi-1/albedo.jpg",
+   "height": "/paintings/lakshmi-1/height.jpg",
+   "preview": "/paintings/lakshmi-1/preview.jpg",
+   "thumb": "/paintings/lakshmi-1/thumb.jpg"
+  },
+  {
+   "id": "lakshmi-2",
+   "category": "lakshmi",
+   "title": "Footsteps of Prosperity",
+   "description": "Alta-red footsteps lead through a lamp-lit doorway.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/lakshmi-2/albedo.jpg",
+   "height": "/paintings/lakshmi-2/height.jpg",
+   "preview": "/paintings/lakshmi-2/preview.jpg",
+   "thumb": "/paintings/lakshmi-2/thumb.jpg"
+  },
+  {
+   "id": "lakshmi-3",
+   "category": "lakshmi",
+   "title": "Gaja Lakshmi Abhishek",
+   "description": "Royal elephants bathe the sacred lotus in light.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/lakshmi-3/albedo.jpg",
+   "height": "/paintings/lakshmi-3/height.jpg",
+   "preview": "/paintings/lakshmi-3/preview.jpg",
+   "thumb": "/paintings/lakshmi-3/thumb.jpg"
+  },
+  {
+   "id": "ganesha-1",
+   "category": "ganesha",
+   "title": "Golden Vighnaharta",
+   "description": "A gilded line portrait of Ganesha within a mandala halo.",
+   "medium": "Gold leaf & acrylic",
+   "albedo": "/paintings/ganesha-1/albedo.jpg",
+   "height": "/paintings/ganesha-1/height.jpg",
+   "preview": "/paintings/ganesha-1/preview.jpg",
+   "thumb": "/paintings/ganesha-1/thumb.jpg"
+  },
+  {
+   "id": "ganesha-2",
+   "category": "ganesha",
+   "title": "Om Shri Ganeshaya Namah",
+   "description": "A sunburst Om framed by marigold torans.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/ganesha-2/albedo.jpg",
+   "height": "/paintings/ganesha-2/height.jpg",
+   "preview": "/paintings/ganesha-2/preview.jpg",
+   "thumb": "/paintings/ganesha-2/thumb.jpg"
+  },
+  {
+   "id": "ganesha-3",
+   "category": "ganesha",
+   "title": "Lamps for Ganapati",
+   "description": "Ganesha on a lotus, encircled by diyas and marigolds.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/ganesha-3/albedo.jpg",
+   "height": "/paintings/ganesha-3/height.jpg",
+   "preview": "/paintings/ganesha-3/preview.jpg",
+   "thumb": "/paintings/ganesha-3/thumb.jpg"
+  },
+  {
+   "id": "diya-1",
+   "category": "diya",
+   "title": "Row of Light",
+   "description": "Nine clay diyas on a ledge strewn with marigold petals.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/diya-1/albedo.jpg",
+   "height": "/paintings/diya-1/height.jpg",
+   "preview": "/paintings/diya-1/preview.jpg",
+   "thumb": "/paintings/diya-1/thumb.jpg"
+  },
+  {
+   "id": "diya-2",
+   "category": "diya",
+   "title": "Floating Diyas",
+   "description": "Lamps and lotuses drifting on a twilight river.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/diya-2/albedo.jpg",
+   "height": "/paintings/diya-2/height.jpg",
+   "preview": "/paintings/diya-2/preview.jpg",
+   "thumb": "/paintings/diya-2/thumb.jpg"
+  },
+  {
+   "id": "diya-3",
+   "category": "diya",
+   "title": "Marigold & Flame",
+   "description": "A brass diya crowned by heavy marigold garlands.",
+   "medium": "Impasto oil",
+   "albedo": "/paintings/diya-3/albedo.jpg",
+   "height": "/paintings/diya-3/height.jpg",
+   "preview": "/paintings/diya-3/preview.jpg",
+   "thumb": "/paintings/diya-3/thumb.jpg"
+  },
+  {
+   "id": "heritage-1",
+   "category": "heritage",
+   "title": "Ghats of Light",
+   "description": "Temple ghats and a river carrying a thousand lamps.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/heritage-1/albedo.jpg",
+   "height": "/paintings/heritage-1/height.jpg",
+   "preview": "/paintings/heritage-1/preview.jpg",
+   "thumb": "/paintings/heritage-1/thumb.jpg"
+  },
+  {
+   "id": "heritage-2",
+   "category": "heritage",
+   "title": "Temple Courtyard Deepstambh",
+   "description": "Twin lamp towers blaze before a shikhara temple.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/heritage-2/albedo.jpg",
+   "height": "/paintings/heritage-2/height.jpg",
+   "preview": "/paintings/heritage-2/preview.jpg",
+   "thumb": "/paintings/heritage-2/thumb.jpg"
+  },
+  {
+   "id": "heritage-3",
+   "category": "heritage",
+   "title": "Fort at Dusk",
+   "description": "Fireworks bloom over the ramparts of a hill fort.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/heritage-3/albedo.jpg",
+   "height": "/paintings/heritage-3/height.jpg",
+   "preview": "/paintings/heritage-3/preview.jpg",
+   "thumb": "/paintings/heritage-3/thumb.jpg"
+  },
+  {
+   "id": "rajasthani-1",
+   "category": "rajasthani",
+   "title": "Royal Elephant Procession",
+   "description": "Caparisoned elephants before pink-city arches.",
+   "medium": "Gouache-style acrylic",
+   "albedo": "/paintings/rajasthani-1/albedo.jpg",
+   "height": "/paintings/rajasthani-1/height.jpg",
+   "preview": "/paintings/rajasthani-1/preview.jpg",
+   "thumb": "/paintings/rajasthani-1/thumb.jpg"
+  },
+  {
+   "id": "rajasthani-2",
+   "category": "rajasthani",
+   "title": "Jharokha Lights",
+   "description": "Sandstone jharokhas, each holding a single flame.",
+   "medium": "Textured acrylic",
+   "albedo": "/paintings/rajasthani-2/albedo.jpg",
+   "height": "/paintings/rajasthani-2/height.jpg",
+   "preview": "/paintings/rajasthani-2/preview.jpg",
+   "thumb": "/paintings/rajasthani-2/thumb.jpg"
+  },
+  {
+   "id": "rajasthani-3",
+   "category": "rajasthani",
+   "title": "Peacock Palace Night",
+   "description": "A peacock dances beneath chhatris and star lanterns.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/rajasthani-3/albedo.jpg",
+   "height": "/paintings/rajasthani-3/height.jpg",
+   "preview": "/paintings/rajasthani-3/preview.jpg",
+   "thumb": "/paintings/rajasthani-3/thumb.jpg"
+  },
+  {
+   "id": "abstract-1",
+   "category": "abstract",
+   "title": "Flame Geometry",
+   "description": "Overlapping orbs resolve into an abstract diya.",
+   "medium": "Acrylic & gold leaf",
+   "albedo": "/paintings/abstract-1/albedo.jpg",
+   "height": "/paintings/abstract-1/height.jpg",
+   "preview": "/paintings/abstract-1/preview.jpg",
+   "thumb": "/paintings/abstract-1/thumb.jpg"
+  },
+  {
+   "id": "abstract-2",
+   "category": "abstract",
+   "title": "Celebration in Colour",
+   "description": "Gestural sweeps of festival colour and gilt.",
+   "medium": "Mixed media",
+   "albedo": "/paintings/abstract-2/albedo.jpg",
+   "height": "/paintings/abstract-2/height.jpg",
+   "preview": "/paintings/abstract-2/preview.jpg",
+   "thumb": "/paintings/abstract-2/thumb.jpg"
+  },
+  {
+   "id": "abstract-3",
+   "category": "abstract",
+   "title": "Night of a Thousand Lights",
+   "description": "A single line-drawn diya in a field of bokeh.",
+   "medium": "Oil on canvas",
+   "albedo": "/paintings/abstract-3/albedo.jpg",
+   "height": "/paintings/abstract-3/height.jpg",
+   "preview": "/paintings/abstract-3/preview.jpg",
+   "thumb": "/paintings/abstract-3/thumb.jpg"
+  },
+  {
+   "id": "folk-1",
+   "category": "folk",
+   "title": "Warli Diwali Dance",
+   "description": "Warli figures dance the tarpa around a central lamp.",
+   "medium": "Rice paste on earth-red (acrylic)",
+   "albedo": "/paintings/folk-1/albedo.jpg",
+   "height": "/paintings/folk-1/height.jpg",
+   "preview": "/paintings/folk-1/preview.jpg",
+   "thumb": "/paintings/folk-1/thumb.jpg"
+  },
+  {
+   "id": "folk-2",
+   "category": "folk",
+   "title": "Madhubani Deep",
+   "description": "A Madhubani-style lamp with fish, petals and bold borders.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/folk-2/albedo.jpg",
+   "height": "/paintings/folk-2/height.jpg",
+   "preview": "/paintings/folk-2/preview.jpg",
+   "thumb": "/paintings/folk-2/thumb.jpg"
+  },
+  {
+   "id": "folk-3",
+   "category": "folk",
+   "title": "Gond Tree of Light",
+   "description": "A Gond-style tree bearing diyas as fruit.",
+   "medium": "Acrylic on canvas",
+   "albedo": "/paintings/folk-3/albedo.jpg",
+   "height": "/paintings/folk-3/height.jpg",
+   "preview": "/paintings/folk-3/preview.jpg",
+   "thumb": "/paintings/folk-3/thumb.jpg"
+  },
+  {
+   "id": "gold-1",
+   "category": "gold",
+   "title": "Golden Mandala",
+   "description": "An intricate gold mandala on midnight black.",
+   "medium": "Gold leaf on canvas",
+   "albedo": "/paintings/gold-1/albedo.jpg",
+   "height": "/paintings/gold-1/height.jpg",
+   "preview": "/paintings/gold-1/preview.jpg",
+   "thumb": "/paintings/gold-1/thumb.jpg"
+  },
+  {
+   "id": "gold-2",
+   "category": "gold",
+   "title": "Emerald & Gold Diyas",
+   "description": "Gilded diyas on emerald with a paisley border.",
+   "medium": "Gold leaf & acrylic",
+   "albedo": "/paintings/gold-2/albedo.jpg",
+   "height": "/paintings/gold-2/height.jpg",
+   "preview": "/paintings/gold-2/preview.jpg",
+   "thumb": "/paintings/gold-2/thumb.jpg"
+  },
+  {
+   "id": "gold-3",
+   "category": "gold",
+   "title": "Gilded Lotus",
+   "description": "A gold-leaf lotus and Om over crimson-black.",
+   "medium": "Gold leaf & oil",
+   "albedo": "/paintings/gold-3/albedo.jpg",
+   "height": "/paintings/gold-3/height.jpg",
+   "preview": "/paintings/gold-3/preview.jpg",
+   "thumb": "/paintings/gold-3/thumb.jpg"
+  }
+ ]
+}

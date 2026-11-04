@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AR tracking diagnostics</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#fff;font:13px/1.4 system-ui,sans-serif;overflow:hidden}
+  #ar{position:fixed;inset:0;overflow:hidden}
+  #log{position:fixed;left:8px;top:8px;z-index:10;background:#000a;padding:6px 8px;border-radius:6px;white-space:pre;max-width:90vw}
+  #go{position:fixed;inset:auto 0 24px 0;margin:auto;width:220px;z-index:10;padding:14px;font-size:16px;border-radius:10px;border:0;background:#f2b84b}
+</style>
+<script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script>
+</head>
+<body>
+<div id="ar"></div>
+<div id="log">diagnostics — ?canvas=demo&painting=traditional-1&tracking=balanced&guides=1</div>
+<button id="go">Start camera</button>
+<script type="module">
+  // Tracking diagnostics page (also used by the automated E2E test).
+  import { ARSession } from '/js/ar.js';
+  const q = new URLSearchParams(location.search);
+  const id = q.get('canvas') || 'demo';
+  const log = (s) => (document.getElementById('log').textContent = s);
+  async function go() {
+    document.getElementById('go').remove();
+    const canvas = await (await fetch(`/api/canvas/${id}`)).json();
+    if (q.get('tracking')) canvas.tracking = q.get('tracking');
+    let painting;
+    try {
+      const cat = await (await fetch('/paintings/catalog.json')).json();
+      painting = cat.paintings.find((p) => p.id === (q.get('painting') || canvas.paintingId)) || cat.paintings[0];
+    } catch { painting = { id: '_test', albedo: '/paintings/_test/albedo.jpg', height: '/paintings/_test/height.jpg' }; }
+    const s = (window.__ar = new ARSession({ container: document.getElementById('ar'), canvas, onState: (st, info) => {
+      window.__states = (window.__states || []).concat(st);
+    } }));
+    window.__events = [];
+    try { await s.start(painting); } catch (e) { log('ERROR ' + (e.kind || '') + ' ' + (e.detail || e.message)); window.__err = e.kind || e.message; return; }
+    if (q.get('guides')) s.setGuides(true);
+    setInterval(() => {
+      const v = s.video;
+      log(`state=${s.state}  video=${v.videoWidth}x${v.videoHeight}  illum=${s.light.gains[4].map((x) => x.toFixed(2)).join(',')}  luma=${s.light.globalLuma.toFixed(3)}`);
+    }, 300);
+  }
+  document.getElementById('go').onclick = go;
+  if (q.get('auto')) go();
+</script>
+</body>
+</html>
