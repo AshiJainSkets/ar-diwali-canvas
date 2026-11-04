@@ -3,6 +3,11 @@
  "canvasAspect": "4:3",
  "categories": [
   {
+   "id": "skets",
+   "name": "Skets Studio",
+   "description": "Our studio, our people, our Diwali."
+  },
+  {
    "id": "traditional",
    "name": "Traditional Diwali Celebration",
    "description": "Homes, lamps and fireworks on the night of Amavasya."
@@ -54,6 +59,72 @@
   }
  ],
  "paintings": [
+  {
+   "id": "skets-1",
+   "category": "skets",
+   "title": "Skets Studio Under Diwali Skies",
+   "description": "Our studio facade glowing with diyas and fireworks.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-1/albedo.jpg",
+   "height": "/paintings/skets-1/height.jpg",
+   "preview": "/paintings/skets-1/preview.jpg",
+   "thumb": "/paintings/skets-1/thumb.jpg"
+  },
+  {
+   "id": "skets-2",
+   "category": "skets",
+   "title": "Courtyard of Lights",
+   "description": "A warm Diwali welcome in the Skets courtyard.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-2/albedo.jpg",
+   "height": "/paintings/skets-2/height.jpg",
+   "preview": "/paintings/skets-2/preview.jpg",
+   "thumb": "/paintings/skets-2/thumb.jpg"
+  },
+  {
+   "id": "skets-3",
+   "category": "skets",
+   "title": "Diwali on the Studio Floor",
+   "description": "Marigolds, diyas and rangoli across the design floor.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-3/albedo.jpg",
+   "height": "/paintings/skets-3/height.jpg",
+   "preview": "/paintings/skets-3/preview.jpg",
+   "thumb": "/paintings/skets-3/thumb.jpg"
+  },
+  {
+   "id": "skets-4",
+   "category": "skets",
+   "title": "Skets Udaan 2026",
+   "description": "The whole Skets family together at Udaan 2026.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-4/albedo.jpg",
+   "height": "/paintings/skets-4/height.jpg",
+   "preview": "/paintings/skets-4/preview.jpg",
+   "thumb": "/paintings/skets-4/thumb.jpg"
+  },
+  {
+   "id": "skets-5",
+   "category": "skets",
+   "title": "Udaan 2025 Celebration",
+   "description": "Celebrating together on the Udaan 2025 stage.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-5/albedo.jpg",
+   "height": "/paintings/skets-5/height.jpg",
+   "preview": "/paintings/skets-5/preview.jpg",
+   "thumb": "/paintings/skets-5/thumb.jpg"
+  },
+  {
+   "id": "skets-6",
+   "category": "skets",
+   "title": "AIA26 Exhibitor Team",
+   "description": "The Skets Studio team at the AIA26 exhibition.",
+   "medium": "Digital oil painting",
+   "albedo": "/paintings/skets-6/albedo.jpg",
+   "height": "/paintings/skets-6/height.jpg",
+   "preview": "/paintings/skets-6/preview.jpg",
+   "thumb": "/paintings/skets-6/thumb.jpg"
+  },
   {
    "id": "traditional-1",
    "category": "traditional",

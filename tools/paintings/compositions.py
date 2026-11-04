@@ -6,6 +6,7 @@ import math
 from motifs import *  # noqa
 
 CATEGORIES = [
+    ('skets', 'Skets Studio', 'Our studio, our people, our Diwali.'),
     ('traditional', 'Traditional Diwali Celebration', 'Homes, lamps and fireworks on the night of Amavasya.'),
     ('rangoli', 'Diwali Rangoli Art', 'Radiant floor art of petals, powders and dots.'),
     ('lakshmi', 'Goddess Lakshmi Inspired', 'Lotus, gold and footsteps of prosperity.'),

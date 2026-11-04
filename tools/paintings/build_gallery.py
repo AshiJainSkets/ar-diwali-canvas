@@ -38,6 +38,13 @@ def main():
             'preview': f'/paintings/{pid}/preview.jpg', 'thumb': f'/paintings/{pid}/thumb.jpg',
         } for pid, cat, title, desc, med, _ in PAINTINGS],
     }
+    # keep artwork added with import_painting.py (e.g. the Skets Studio category)
+    cat_path = os.path.join(OUT, 'catalog.json')
+    if os.path.exists(cat_path):
+        generated = {p[0] for p in PAINTINGS}
+        catalog['paintings'] += [p for p in json.load(open(cat_path))['paintings'] if p['id'] not in generated]
+    order = {c['id']: i for i, c in enumerate(catalog['categories'])}
+    catalog['paintings'].sort(key=lambda p: order.get(p['category'], 99))
     with open(os.path.join(OUT, 'catalog.json'), 'w') as fh:
         json.dump(catalog, fh, indent=1, ensure_ascii=False)
     print('catalog written:', len(catalog['paintings']), 'paintings')
