@@ -209,3 +209,26 @@ h1.title em { font-style: italic; font-weight: 500; color: var(--gold-2); }
 .msg .actions { margin-top: 20px; }
 .ic-big { width: 64px; height: 64px; margin: 0 auto; display: grid; place-items: center; border-radius: 50%; background: rgba(232,184,74,.12); color: var(--gold-2); }
 .ic-big svg { width: 32px; height: 32px; }
+
+/* ---------- Living Canvas: "Bring to Life" floating control ---------- */
+.magic-btn {
+  position: absolute; right: 14px; bottom: calc(96px + var(--safe-b));
+  display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 16px 0 6px;
+  border-radius: 999px; border: 1px solid rgba(255, 225, 160, .45); cursor: pointer;
+  color: #fff6e0; font-weight: 700; font-size: 14px; letter-spacing: .01em;
+  background: linear-gradient(135deg, rgba(92, 28, 94, .88), rgba(150, 52, 30, .88));
+  box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08) inset, 0 0 24px rgba(255, 190, 90, .25);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform .15s ease, background .3s ease, box-shadow .3s ease;
+}
+.magic-btn:active { transform: scale(.96); }
+.magic-ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #2a1704;
+  background: radial-gradient(circle at 35% 30%, #fff3c4, #e8b84a 55%, #b5791c); }
+.magic-ic svg { width: 20px; height: 20px; animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 50% { transform: rotate(18deg) scale(1.12); } }
+.magic-btn[aria-pressed="true"] { background: linear-gradient(135deg, rgba(232, 184, 74, .95), rgba(201, 141, 36, .95)); color: #2a1704;
+  box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 32px rgba(255, 200, 100, .55); }
+.magic-btn[aria-pressed="true"] .magic-ic { background: #2a1704; color: #ffd77a; }
+.magic-btn[aria-pressed="true"] .magic-ic svg { animation-duration: .9s; }
+.magic-btn[hidden] { display: none; }
+@media (min-width: 900px) { .magic-btn { right: 24px; bottom: calc(110px + var(--safe-b)); } }

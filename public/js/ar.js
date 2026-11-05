@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { MindARThree } from '/vendor/mindar/mindar-image-three.prod.js';
 import { createPaintingMaterial, loadPaintingTextures } from './paintingMaterial.js';
 import { LightEstimator } from './lightEstimator.js';
+import { LivingFx } from './fxLayer.js';
 import { fitHomographyRobust, homographyFrom4, apply, mul3, OneEuro } from './homography.js';
 
 // mindar*: MindAR's internal pose filter (ms time base) — only used for the pose fallback.
@@ -25,11 +26,15 @@ export class CameraError extends Error {
   constructor(kind, detail) { super(kind); this.kind = kind; this.detail = detail; }
 }
 
-export async function openCamera() {
+export async function openCamera({ hd = false } = {}) {
   if (!window.isSecureContext) throw new CameraError('insecure');
   if (!navigator.mediaDevices?.getUserMedia) throw new CameraError('unsupported');
+  // Default = the camera's native default size (what MindAR is tuned for, ~640×480 on most phones).
+  // HD mode asks for 1280×720: sharper at long distance, but heavier and less compatible.
   const tries = [
-    { audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+    hd
+      ? { audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } }
+      : { audio: false, video: { facingMode: { ideal: 'environment' } } },
     { audio: false, video: { facingMode: 'environment' } },
     { audio: false, video: true },
   ];
@@ -95,7 +100,7 @@ export class ARSession {
   async start(painting) {
     this._setState('starting');
     if (!this.cfg.targetUrl) throw new CameraError('notarget');
-    this.stream = await openCamera();
+    this.stream = await openCamera({ hd: !!this.cfg.hd });
     this._setState('loading');
 
     this.mindar = new StreamMindAR({
@@ -122,6 +127,8 @@ export class ARSession {
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), this.material);
     this.mesh.frustumCulled = false;
     scene.add(this.mesh);
+    this.fx = new LivingFx(scene);   // 3D effects that emerge from the canvas (Bring to Life)
+    this.animOn = false;
 
     // 2D overlay for calibration guides
     this.guideCanvas = document.createElement('canvas');
@@ -141,6 +148,20 @@ export class ARSession {
     const [tw, th] = ctl.markerDimensions[0];
     this.targetPx = { w: tw, h: th, corners: [{ x: 0, y: 0 }, { x: tw, y: 0 }, { x: tw, y: th }, { x: 0, y: th }] };
     this._tapTracker(ctl);
+    this._tapDiagnostics(ctl);
+    // Some phones (notably iOS) report the camera size at start, then change it once the stream
+    // settles (e.g. portrait swap). MindAR draws frames using the size it saw at start, so a silent
+    // change squashes every frame and the canvas is never found. Watch for it and adapt / restart.
+    this._onVideoResize = () => {
+      const v = this.video; if (!v || !v.videoWidth) return;
+      this.diag.videoResizes++;
+      v.setAttribute('width', v.videoWidth); v.setAttribute('height', v.videoHeight);
+      const same = v.videoWidth === ctl.inputWidth && v.videoHeight === ctl.inputHeight;
+      const swapped = v.videoWidth === ctl.inputHeight && v.videoHeight === ctl.inputWidth;
+      if (same || swapped) { try { this.mindar.resize(); } catch {} }
+      else this._setState('needs-restart');
+    };
+    this.video.addEventListener('resize', this._onVideoResize);
     await Promise.all([lightInit, first.catch(() => {})]);
     this._last = performance.now();
     renderer.setAnimationLoop(() => this._frame());
@@ -175,6 +196,45 @@ export class ARSession {
       return r;
     };
   }
+
+  /** Lightweight counters for the on-screen diagnostics panel (?debug=1). */
+  _tapDiagnostics(ctl) {
+    const d = (this.diag = { frames: 0, detects: 0, lastFeatures: 0, maxFeatures: 0, matchCalls: 0, matches: 0, videoResizes: 0 });
+    try {
+      const cd = ctl.cropDetector;
+      if (cd?.detectMoving) {
+        const o = cd.detectMoving.bind(cd);
+        cd.detectMoving = (...a) => { const r = o(...a); d.detects++; d.lastFeatures = r?.featurePoints?.length || 0; d.maxFeatures = Math.max(d.maxFeatures, d.lastFeatures); return r; };
+      }
+      if (ctl._workerMatch) {
+        const o = ctl._workerMatch.bind(ctl);
+        ctl._workerMatch = async (...a) => { const r = await o(...a); d.matchCalls++; if (r && r.targetIndex !== -1 && r.targetIndex != null) d.matches++; return r; };
+      }
+      const ou = ctl.onUpdate;
+      ctl.onUpdate = (u) => { if (u?.type === 'processDone') d.frames++; if (ou) ou(u); };
+    } catch (e) { /* diagnostics must never break tracking */ }
+  }
+
+  /** Snapshot of diagnostics for display / support. */
+  diagnostics() {
+    const ctl = this.mindar?.controller, v = this.video;
+    let gpu = '';
+    try { const gl = this.renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); gpu = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch {}
+    let backend = '';
+    try { backend = window.MINDAR?.IMAGE?.tf?.getBackend?.() || ''; } catch {}
+    return {
+      state: this.state,
+      video: v ? `${v.videoWidth}×${v.videoHeight} (attr ${v.getAttribute('width')}×${v.getAttribute('height')}, ready ${v.readyState}, ${v.paused ? 'paused' : 'playing'})` : '-',
+      trackerInput: ctl ? `${ctl.inputWidth}×${ctl.inputHeight}` : '-',
+      target: this.targetPx ? `${this.targetPx.w}×${this.targetPx.h}` : '-',
+      backend, gpu,
+      ...this.diag,
+      homography: `${this.stats.hFrames} h / ${this.stats.poseFrames} pose, rms ${this.stats.lastRms.toFixed(2)}`,
+      ua: navigator.userAgent,
+    };
+  }
+  /** The exact greyscale frame the tracker analyses (to spot black / squashed frames). */
+  trackerInputCanvas() { return this.mindar?.controller?.inputLoader?.context?.canvas || null; }
 
   // ---- geometry ---------------------------------------------------------------
   setCalibration(cal) { this.cfg.calibration = { ...this.cfg.calibration, ...cal }; }
@@ -241,10 +301,66 @@ export class ARSession {
     }
     u.mapB.value = tex.albedo; u.heightB.value = tex.height; u.texelB.value.copy(tex.texel);
     u.reveal.value = 0;
+    this._applyAnimation(painting, tex);
     const firstEver = !this.currentPaintingId;
     this.reveal = { from: 0, to: 1, t0: performance.now(), dur: firstEver ? 1800 : 1400, waitForLock: firstEver };
     this.currentPaintingId = painting.id;
     this.onState('painting-ready', { painting });
+  }
+
+  // ---- Living Canvas ("Bring to Life") ----------------------------------------------
+  /** Wire the painting's prepared animation assets (loaded with the painting, so no delay). */
+  _applyAnimation(painting, tex) {
+    const u = this.material.uniforms;
+    const black = this.material.userData.black;
+    u.fxMap.value = tex.fx || black;
+    u.motionMap.value = tex.motion || black;
+    u.hasFx.value = tex.fx ? 1 : 0;
+    const halos = (tex.anim && tex.anim.halos) || [];
+    for (let i = 0; i < 3; i++) {
+      const h = halos[i];
+      u.halos.value[i].set(h ? h.u : 0, h ? 1 - h.v : 0, h ? h.r0 : 0, h ? h.r1 : 0);
+      u.haloSpeed.value[i] = h ? (h.speed ?? 0.25) : 0;
+    }
+    this.currentAnim = tex.anim || null;
+    this.fx.setManifest(this.currentAnim, (uu, vv) => this._uvToCanvas3D(uu, vv));
+    this._setupVideo(painting);
+  }
+  hasAnimation() { return !!this.currentAnim || this.material.uniforms.hasFx.value > 0; }
+
+  /** Optional pre-rendered animated version (e.g. image-to-video clip). Its first frame must be
+   *  the painting; it is cross-faded in only once it is actually playing (no loading flash). */
+  _setupVideo(painting) {
+    if (this.videoEl) { this.videoEl.pause(); this.videoEl.removeAttribute('src'); this.videoEl.load(); this.videoEl = null; }
+    if (this.videoTex) { this.videoTex.dispose(); this.videoTex = null; }
+    this.material.uniforms.videoMix.value = 0;
+    this.videoReady = false;
+    if (!painting.video) return;
+    const v = document.createElement('video');
+    Object.assign(v, { muted: true, loop: true, playsInline: true, preload: 'auto', crossOrigin: 'anonymous' });
+    v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+    v.src = painting.video;
+    v.addEventListener('playing', () => { this.videoReady = true; }, { once: false });
+    this.videoEl = v;
+    this.videoTex = new THREE.VideoTexture(v);
+    this.videoTex.colorSpace = THREE.SRGBColorSpace;
+    this.material.uniforms.videoMap.value = this.videoTex;
+  }
+
+  setAnimating(on) {
+    this.animOn = !!on;
+    if (this.videoEl) {
+      if (on) { this.videoEl.currentTime = 0; this.videoEl.play().catch(() => {}); }
+    }
+    this.onState(on ? 'anim-on' : 'anim-off');
+  }
+
+  /** Painting uv (u→right, v→down, 0..1) → 3D point in MindAR anchor space (z = 0 on canvas). */
+  _uvToCanvas3D(uu, vv) {
+    const L = this._layoutMatrix();
+    const p = apply(L, { x: uu, y: 1 - vv });
+    const tw = this.targetPx.w, th = this.targetPx.h;
+    return new THREE.Vector3(p.x / tw - 0.5, (0.5 - p.y / th) * (th / tw), 0);
   }
 
   // ---- tracking events ------------------------------------------------------------
@@ -340,6 +456,21 @@ export class ARSession {
     }
 
     u.time.value = now / 1000;
+
+    // 6) Living Canvas: ramp animation in/out (seamless — 0 is exactly the static painting)
+    const target = this.animOn ? 1 : 0;
+    u.uAnim.value += (target - u.uAnim.value) * Math.min(1, dt * 3.2);
+    if (Math.abs(u.uAnim.value - target) < 0.002) u.uAnim.value = target;
+    if (u.uAnim.value > 0) u.animTime.value += dt; else u.animTime.value = 0;
+    if (this.videoEl) {
+      const want = this.animOn && this.videoReady ? 1 : 0;
+      u.videoMix.value += (want - u.videoMix.value) * Math.min(1, dt * 3);
+      if (!this.animOn && u.videoMix.value < 0.01 && !this.videoEl.paused) this.videoEl.pause();
+    }
+    if (this.targetSeen) this._lastPose = (this._lastPose || new THREE.Matrix4()).copy(this.anchor.group.matrix);
+    if (this.fx && this.targetPx) {
+      this.fx.update(dt, this._lastPose || null, this.animOn, this.mesh.visible && this.opacity > 0.3 && !!this._lastPose, this.camera, this.container.clientHeight);
+    }
     this.renderer.render(this.scene, this.camera);
     if (this.showGuides) this._drawGuides();
   }
@@ -374,12 +505,14 @@ export class ARSession {
 
   stop() {
     document.removeEventListener('visibilitychange', this._onVis);
+    try { this.video?.removeEventListener('resize', this._onVideoResize); } catch {}
     try { this.renderer?.setAnimationLoop(null); } catch {}
     try { this.mindar?.controller?.stopProcessVideo(); } catch {}
     try { this.stream?.getTracks().forEach((t) => t.stop()); } catch {}
     try { this.mindar?.video?.remove(); if (this.mindar) this.mindar.video = null; } catch {}
     try {
-      this.material?.dispose(); this.mesh?.geometry.dispose();
+      this.material?.dispose(); this.mesh?.geometry.dispose(); this.fx?.dispose();
+      if (this.videoEl) { this.videoEl.pause(); this.videoEl = null; }
       this.renderer?.dispose();
       this.renderer?.domElement.remove();
       this.mindar?.cssRenderer?.domElement.remove();

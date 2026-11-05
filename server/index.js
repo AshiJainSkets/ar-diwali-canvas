@@ -122,7 +122,12 @@ app.use((req, res, next) => {
 // Static: long cache for immutable vendor/fonts/paintings, short for app code.
 app.use('/vendor', express.static(path.join(PUBLIC_DIR, 'vendor'), { maxAge: '30d', immutable: true }));
 app.use('/fonts', express.static(path.join(PUBLIC_DIR, 'fonts'), { maxAge: '30d', immutable: true }));
-app.use('/paintings', express.static(path.join(PUBLIC_DIR, 'paintings'), { maxAge: '7d' }));
+// The gallery list must always be fresh (new paintings appear immediately); images may be
+// replaced under the same name, so they are cached for 1 hour and revalidated after that.
+app.use('/paintings', express.static(path.join(PUBLIC_DIR, 'paintings'), {
+  maxAge: '1h',
+  setHeaders: (res, file) => { if (file.endsWith('catalog.json')) res.set('Cache-Control', 'no-cache'); },
+}));
 app.use('/targets', express.static(path.join(DATA_DIR, 'targets'), { maxAge: '7d' }));
 app.use(express.static(PUBLIC_DIR, { maxAge: '5m', index: false }));
 

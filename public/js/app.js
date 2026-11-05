@@ -11,6 +11,8 @@ const pathMatch = location.pathname.match(/^\/c\/([^/?#]+)/);
 const viaQR = !!pathMatch;
 const canvasId = decodeURIComponent(pathMatch?.[1] || params.get('canvas') || 'demo');
 const calibrate = params.get('calibrate') === '1';
+const debug = params.get('debug') === '1';
+let hd = params.get('hd') === '1';
 
 const state = { canvas: null, catalog: null, paintings: [], selected: null, cat: 'all', session: null, returnTo: 'welcome' };
 
@@ -20,7 +22,7 @@ boot().catch((e) => showMessage({ icon: 'alert', title: 'Something went wrong', 
 async function boot() {
   const [canvasRes, catalogRes] = await Promise.all([
     fetch(`/api/canvas/${encodeURIComponent(canvasId)}`),
-    fetch('/paintings/catalog.json'),
+    fetch('/paintings/catalog.json', { cache: 'no-cache' }),
   ]);
   if (canvasRes.status === 404) {
     return showMessage({ icon: 'alert', title: 'Canvas not found', text: `There is no canvas with the ID <b>${esc(canvasId)}</b>. Check the QR code or ask the organiser.`, actions: [{ label: 'Open the demo', primary: true, onClick: () => (location.href = '/') }] });
@@ -182,7 +184,10 @@ function setStatus(text, locked) {
   $('#status').classList.toggle('locked', !!locked);
 }
 function setScanHint(title, text) {
-  $('#scan-text').innerHTML = `<b>${esc(title)}</b><span>${esc(text)}</span>`;
+  const box = $('#scan-text');
+  const actions = box.querySelector('.hint-actions');
+  box.innerHTML = `<b>${esc(title)}</b><span>${esc(text)}</span>`;
+  if (actions) box.appendChild(actions);
 }
 
 async function startAR() {
@@ -197,9 +202,10 @@ async function startAR() {
   $('#veil-text').textContent = 'Opening camera…';
   $('#scan-guide').classList.remove('hide');
   $('#scan-text').hidden = false;
-  setScanHint('Point your camera at the canvas', 'Fit the whole frame on screen, about 1.5–3 m away.');
+  setScanHint('Point your camera at the canvas', 'Fit the whole canvas in view so it fills most of the screen — about 2 m from a 4 ft canvas, closer for a smaller print or monitor.');
   setStatus('Starting…');
   $('#ar-pick').hidden = !state.canvas.allowSwitch;
+  $('#ar-magic').hidden = true;
   $('#fab-img').src = state.selected.thumb;
 
   let ARSession, CameraError;
@@ -208,13 +214,14 @@ async function startAR() {
   } catch (e) {
     return showMessage({ icon: 'alert', title: 'Could not load AR', text: 'Your browser could not load the AR engine. Check your connection, or try an up-to-date Safari or Chrome.', actions: [{ label: 'Retry', primary: true, onClick: () => location.reload() }] });
   }
-  const s = new ARSession({ container: $('#ar-stage'), canvas: state.canvas, onState: onARState });
+  const s = new ARSession({ container: $('#ar-stage'), canvas: { ...state.canvas, hd }, onState: onARState });
   state.session = s;
   window.__ar = s; // diagnostics
   try {
     await s.start(state.selected);
     wireARControls(s);
     if (calibrate) buildCalibration(s);
+    if (debug) showDiagnostics(s);
   } catch (e) {
     s.stop();
     state.session = null;
@@ -232,7 +239,7 @@ function onARState(st, info) {
       $('#veil').classList.add('hide');
       $('#scan-guide').classList.remove('hide');
       $('#scan-text').hidden = false;
-      setScanHint('Point your camera at the canvas', 'Fit the whole frame on screen, about 1.5–3 m away.');
+      setScanHint('Point your camera at the canvas', 'Fit the whole canvas in view so it fills most of the screen — about 2 m from a 4 ft canvas, closer for a smaller print or monitor.');
       setStatus('Looking for the canvas');
       break;
     case 'tracking':
@@ -255,8 +262,15 @@ function onARState(st, info) {
     case 'hint':
       if (state.session?.state === 'tracking') break;
       if (info.dark) setScanHint('It’s quite dark here', 'Turn on a light near the canvas, or move closer.');
-      else if (info.scanningMs > 12000) setScanHint('Still looking…', 'Step back so all four corners are visible, hold steady, and avoid strong glare on the canvas.');
-      else setScanHint('Point your camera at the canvas', 'Hold the phone steady with the whole frame in view.');
+      else if (info.scanningMs > 12000) {
+        setScanHint('Still looking…', 'Make sure the screen shows the tracking print (the patterned page with the QR code). Fit all four corners in view, hold steady, avoid glare.');
+        addHintActions();
+      } else setScanHint('Point your camera at the canvas', 'Hold the phone steady with the whole canvas in view.');
+      break;
+    case 'needs-restart':
+      // camera changed resolution after start — restart the tracker with the real size
+      if ((state.autoRestarts = (state.autoRestarts || 0) + 1) > 2) break; // never loop
+      setTimeout(() => { const s = state.session; if (!s) return; s.stop(); state.session = null; startAR(); }, 50);
       break;
     case 'painting-ready':
       if (state.session?.state === 'tracking') toast(info.painting.title);
@@ -267,7 +281,24 @@ function onARState(st, info) {
   }
 }
 
+function setMagicButton(on) {
+  const b = $('#ar-magic');
+  b.setAttribute('aria-pressed', String(!!on));
+  b.querySelector('.magic-label').textContent = on ? 'Pause ❚❚' : 'Bring to Life ✨';
+  b.title = on ? 'Pause the animation' : 'Bring the painting to life';
+}
+
 function wireARControls(s) {
+  const magic = $('#ar-magic');
+  magic.hidden = false;
+  setMagicButton(state.animating);
+  if (state.animating) s.setAnimating(true);       // keep "alive" mode when AR restarts
+  magic.onclick = () => {
+    state.animating = !state.animating;
+    s.setAnimating(state.animating);
+    setMagicButton(state.animating);
+    if (state.animating && s.state !== 'tracking') toast('Point at the canvas to see it come alive ✨');
+  };
   $('#ar-exit').onclick = exitAR;
   $('#ar-reset').onclick = () => { s.resetTracking(); toast('Tracking reset — point at the canvas'); };
   $('#ar-pick').onclick = openPicker;
@@ -346,6 +377,59 @@ function showMessage({ icon = 'alert', title, text, actions = [] }) {
   }
   if (state.session) { state.session.stop(); state.session = null; }
   show('message');
+}
+
+function addHintActions() {
+  const box = $('#scan-text');
+  if (box.querySelector('.hint-actions')) return;
+  const row = document.createElement('div');
+  row.className = 'hint-actions';
+  row.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap';
+  row.innerHTML = `<button class="btn small" data-h="diag">Show diagnostics</button><button class="btn small" data-h="cam">${hd ? 'Use standard camera' : 'Try HD camera'}</button>`;
+  row.onclick = (e) => {
+    const h = e.target.dataset.h;
+    if (h === 'diag' && state.session) showDiagnostics(state.session);
+    if (h === 'cam') { hd = !hd; const s = state.session; if (s) { s.stop(); state.session = null; } startAR(); }
+  };
+  box.appendChild(row);
+}
+
+// ------------------------------------------------------------------ diagnostics (?debug=1 or from the hint)
+let diagTimer;
+function showDiagnostics(s) {
+  const panel = $('#calib');
+  panel.hidden = false;
+  panel.innerHTML = `<h4>Tracking diagnostics</h4>
+    <canvas id="diag-view" style="width:100%;border-radius:8px;background:#000;display:block;margin-bottom:8px"></canvas>
+    <pre id="diag-text" style="white-space:pre-wrap;font-size:11px;line-height:1.35;margin:0;color:#e7d9cb"></pre>
+    <div class="row"><button class="btn small" data-d="copy">Copy</button><button class="btn small" data-d="close">Close</button></div>
+    <p style="color:var(--muted);margin:8px 0 0">The picture above is exactly what the tracker sees. Take a screenshot of this panel if the canvas isn’t found.</p>`;
+  let lastFrames = 0, lastT = performance.now();
+  const tick = () => {
+    if (!state.session || panel.hidden) return clearInterval(diagTimer);
+    const d = s.diagnostics();
+    const now = performance.now();
+    const fps = ((d.frames - lastFrames) * 1000) / (now - lastT);
+    lastFrames = d.frames; lastT = now;
+    $('#diag-text').textContent =
+      `state: ${d.state}   tracker fps: ${fps.toFixed(1)}\nvideo: ${d.video}\ntracker input: ${d.trackerInput}  target: ${d.target}\n` +
+      `features: ${d.lastFeatures} (max ${d.maxFeatures})  detections: ${d.detects}\nmatch tries: ${d.matchCalls}  matches: ${d.matches}  resizes: ${d.videoResizes}\n` +
+      `${d.homography}\nbackend: ${d.backend}  gpu: ${d.gpu}\n${hd ? 'camera: HD\n' : 'camera: standard\n'}${d.ua}`;
+    const src = s.trackerInputCanvas(), view = $('#diag-view');
+    if (src && src.width) {
+      const w = 240, h = Math.round((w * src.height) / src.width);
+      if (view.width !== w || view.height !== h) { view.width = w; view.height = h; }
+      try { view.getContext('2d').drawImage(src, 0, 0, w, h); } catch {}
+    }
+  };
+  clearInterval(diagTimer);
+  diagTimer = setInterval(tick, 700);
+  tick();
+  panel.onclick = (e) => {
+    const a = e.target.dataset.d;
+    if (a === 'close') { panel.hidden = true; clearInterval(diagTimer); }
+    if (a === 'copy') navigator.clipboard?.writeText($('#diag-text').textContent).then(() => toast('Diagnostics copied'));
+  };
 }
 
 // ------------------------------------------------------------------ calibration (admin, ?calibrate=1)

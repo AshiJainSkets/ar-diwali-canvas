@@ -8,6 +8,27 @@ import math, os
 FONT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'fonts'))
 W, H = 1600, 1200
 
+# ---- animation anchors -------------------------------------------------------------
+# Motifs record what they draw (flames, lanterns, fireworks, stars...) so every painting gets an
+# animation built from its exact contents. Callers that wrap motifs in SVG transforms pause
+# recording with `with no_anchors():` and add their own anchors.
+ANCHORS = []
+_REC = [True]
+
+
+def anchor(*a):
+    if _REC[0]:
+        ANCHORS.append(a)
+
+
+class no_anchors:
+    def __enter__(self): self.prev = _REC[0]; _REC[0] = False
+    def __exit__(self, *e): _REC[0] = self.prev
+
+
+def reset_anchors():
+    ANCHORS.clear(); _REC[0] = True
+
 
 def f(v):
     return f'{v:.1f}'
@@ -63,6 +84,7 @@ def glow(x, y, r, opacity=1.0, grad='glow'):
 
 
 def flame(x, y, h, lean=0.0):
+    anchor('flame', x, y - h * 0.45, h)
     w = h * 0.38
     return (f'<g transform="translate({f(x)} {f(y)}) rotate({lean})">'
             f'<path d="M0 0 C{f(-w)} {f(-h*0.25)} {f(-w*0.35)} {f(-h*0.7)} 0 {f(-h)} C{f(w*0.35)} {f(-h*0.7)} {f(w)} {f(-h*0.25)} 0 0Z" fill="url(#flame)"/>'
@@ -92,6 +114,8 @@ def diya(x, y, s, body='clay', band='#f5c542', dots='#fff1c9', lit=True, glow_r=
 
 
 def lotus(x, y, s, grad='petalPink', leaf=True, rot=0):
+    if s >= 60:
+        anchor('petals', x, y - s * 0.55, s * 0.5, ['#f7a8c0', '#fbe9ef', '#d2477a'])
     out = [f'<g transform="translate({f(x)} {f(y)}) rotate({rot}) scale({f(s)})">']
     if leaf:
         out.append('<ellipse cx="0" cy="0.2" rx="1.55" ry="0.32" fill="#2f6b3a"/><ellipse cx="0" cy="0.16" rx="1.4" ry="0.24" fill="#4f8f4c"/>')
@@ -134,10 +158,14 @@ def garland(x0, y0, x1, y1, sag, r, rng, colors=(('#f28c0f', '#ffc93c', '#c45a06
             out.append(leaf(x, y + r * 0.4, r * 1.4, 70 + rng.random() * 40))
         c = colors[i % len(colors)]
         out.append(marigold(x, y, r * (0.9 + rng.random() * 0.2), rng, *c))
+        anchor('sway', x - r * 1.3, y - r * 1.3, x + r * 1.3, y + r * 1.8, 0.8)
+        if i % 5 == 2:
+            anchor('petals', x, y, r * 1.2, [c[0], c[1], '#ffe066'])
     return ''.join(out)
 
 
 def toran(y, rng, x0=0, x1=W, leaf_len=70):
+    anchor('sway', x0, y, x1, y + leaf_len * 1.05, 0.9)
     out = [f'<rect x="{x0}" y="{y-14}" width="{x1-x0}" height="16" fill="#8b1e1e"/>']
     n = int((x1 - x0) / (leaf_len * 0.55))
     for i in range(n):
@@ -210,6 +238,7 @@ def rangoli(cx, cy, R, rng, pal, outline='#fff7e8', layers=None):
 
 
 def firework(x, y, r, color, rng, n=36, width=3):
+    anchor('firework', x, y, r, color)
     out = [glow(x, y, r * 0.9, 0.5, 'glowSoft')]
     for i in range(n):
         a = i / n * 2 * math.pi + rng.random() * 0.1
@@ -227,16 +256,25 @@ def bokeh(rng, n, x0, y0, x1, y1, colors, rmin=6, rmax=30, op=(0.25, 0.7)):
     for _ in range(n):
         x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
         r = rng.uniform(rmin, rmax)
+        anchor('bulb', x, y, r, (x * 0.0137 + y * 0.0071) % 1.0)  # no rng call: keeps the painting identical
         out.append(f'<circle cx="{f(x)}" cy="{f(y)}" r="{f(r)}" fill="{rng.choice(colors)}" opacity="{rng.uniform(*op):.2f}"/>')
     return ''.join(out)
 
 
 def stars(rng, n, y1=600, color='#fff8e0'):
-    return ''.join(f'<circle cx="{f(rng.uniform(0,W))}" cy="{f(rng.uniform(0,y1))}" r="{f(rng.uniform(0.8,2.6))}" fill="{color}" opacity="{rng.uniform(0.4,1):.2f}"/>' for _ in range(n))
+    out = []
+    for _ in range(n):
+        x, y, r, o = rng.uniform(0, W), rng.uniform(0, y1), rng.uniform(0.8, 2.6), rng.uniform(0.4, 1)
+        if r > 1.6:
+            anchor('star', x, y, r * 3.5)
+        out.append(f'<circle cx="{f(x)}" cy="{f(y)}" r="{f(r)}" fill="{color}" opacity="{o:.2f}"/>')
+    return ''.join(out)
 
 
 def lantern(x, y, s, color='#e0303a', color2='#ffb000', rng=None):
     """Akash kandil (star lantern) hanging from a string."""
+    anchor('swing', x, 0, s * 2.6, y + s * 1.9)
+    anchor('glow', x, y, s * 0.9)
     out = [f'<line x1="{f(x)}" y1="0" x2="{f(x)}" y2="{f(y - s)}" stroke="#2b1408" stroke-width="2"/>', glow(x, y, s * 2.6, 0.9)]
     out.append(f'<g transform="translate({f(x)} {f(y)}) scale({f(s)})">')
     pts = []
@@ -257,6 +295,7 @@ def lantern(x, y, s, color='#e0303a', color2='#ffb000', rng=None):
 
 
 def sky_lantern(x, y, s):
+    anchor('flame', x, y + s * 0.3, s * 1.6)
     return (glow(x, y, s * 3, 0.7) +
             f'<g transform="translate({f(x)} {f(y)}) scale({f(s)})"><path d="M-0.6 -1 L0.6 -1 L0.8 1 L-0.8 1Z" fill="#ffb347"/><path d="M-0.45 -0.85 L0.45 -0.85 L0.6 0.9 L-0.6 0.9Z" fill="#ffe08a"/><ellipse cx="0" cy="1" rx="0.8" ry="0.12" fill="#ff8c1a"/></g>')
 
@@ -284,6 +323,8 @@ def coins(x, y, s, rng, n=14, spread=1.0):
         cy = y + rng.gauss(0, s * 0.35 * spread)
         r = s * rng.uniform(0.45, 0.6)
         tilt = rng.uniform(0.35, 0.7)
+        if i % 3 == 0:
+            anchor('star', cx, cy - r * 0.2, r * 0.7)
         out.append(f'<g transform="translate({f(cx)} {f(cy)}) rotate({rng.uniform(-20,20):.0f})"><ellipse rx="{f(r)}" ry="{f(r*tilt)}" fill="#8a5a12"/><ellipse rx="{f(r*0.95)}" ry="{f(r*tilt*0.9)}" cy="{f(-r*0.06)}" fill="url(#gold)"/><ellipse rx="{f(r*0.6)}" ry="{f(r*tilt*0.55)}" cy="{f(-r*0.06)}" fill="none" stroke="#9b6a14" stroke-width="{f(r*0.06)}"/></g>')
     return ''.join(out)
 
@@ -301,6 +342,7 @@ def footprint(x, y, s, ang=0, color='#c4142b', deco='#fff1d6'):
 
 
 def om(x, y, size, fill='url(#gold)', opacity=1):
+    anchor('glow', x, y, size * 0.5)
     return f'<text x="{f(x)}" y="{f(y)}" font-family="Deva" font-weight="700" font-size="{f(size)}" text-anchor="middle" dominant-baseline="central" fill="{fill}" opacity="{opacity}">ॐ</text>'
 
 
@@ -377,6 +419,8 @@ def elephant(x, y, s, body='#5b6b8c', cloth='#c4142b', trim='#f1c34b', facing=1)
 
 
 def peacock(x, y, s, rng, fan=True):
+    if fan:
+        anchor('sway', x - s * 2.0, y - s * 2.0, x + s * 2.0, y - s * 0.6, 0.5)
     o = [f'<g transform="translate({f(x)} {f(y)}) scale({f(s)})">']
     if fan:
         for i in range(23):
@@ -384,6 +428,7 @@ def peacock(x, y, s, rng, fan=True):
             L = 1.9 + rng.uniform(-0.1, 0.1)
             ex, ey = math.cos(a) * L, math.sin(a) * L
             o.append(f'<path d="M0 0 Q{f(ex*0.5)} {f(ey*0.5 - 0.05)} {f(ex)} {f(ey)}" stroke="#2f7d4f" stroke-width="0.05" fill="none"/>')
+            anchor('star', x + ex * s, y + ey * s, s * 0.09)
             o.append(f'<g transform="translate({f(ex)} {f(ey)}) rotate({math.degrees(a)+90:.0f})"><ellipse rx="0.2" ry="0.28" fill="#1f8a5b"/><ellipse rx="0.14" ry="0.2" fill="#d8b23a"/><ellipse rx="0.09" ry="0.13" fill="#1a5fa8"/><ellipse rx="0.045" ry="0.07" fill="#0b1f4a"/></g>')
     # body
     o.append('<path d="M-0.3 0.15 C-0.4 -0.3 -0.1 -0.6 0.05 -0.75 C0.1 -1.0 0.05 -1.2 0.15 -1.35 C0.3 -1.45 0.42 -1.35 0.38 -1.2 L0.5 -1.15 L0.38 -1.1 C0.3 -0.9 0.38 -0.6 0.4 -0.3 C0.45 0.0 0.2 0.25 -0.3 0.15Z" fill="#1959b5"/>')
@@ -424,6 +469,7 @@ def warli_figure(x, y, s, ang=0, color='#f6efe2', arms='up'):
 
 
 def mandala_lines(cx, cy, R, rng, color='url(#gold)', sw=3, rings=7):
+    anchor('mandala', cx, cy, R)
     o = [f'<g transform="translate({f(cx)} {f(cy)})" fill="none" stroke="{color}" stroke-width="{sw}">']
     r = R
     for k in range(rings):
@@ -467,6 +513,7 @@ def haveli(x0, y_ground, w, h, rng, wall='#2a1630', window='#ffb84d', diya_row=T
         for i in range(n):
             cx = x0 + (i + 0.5) * w / n
             o.append(glow(cx, yb - 55, 70, 0.35, 'glowSoft'))
+            anchor('glow', cx, yb - 50, 30)
             o.append(cusped_arch(cx - 26, yb, 52, 100, window))
             o.append(cusped_arch(cx - 26, yb, 52, 100, 'none', '#5c2a14', 3))
         if diya_row:

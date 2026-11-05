@@ -102,7 +102,14 @@ def main():
     entry = {'id': a.id, 'category': a.category, 'title': a.title, 'description': a.description, 'medium': a.medium,
              'albedo': f'/paintings/{a.id}/albedo.jpg', 'height': f'/paintings/{a.id}/height.jpg',
              'preview': f'/paintings/{a.id}/preview.jpg', 'thumb': f'/paintings/{a.id}/thumb.jpg'}
-    catalog['paintings'] = [p for p in catalog['paintings'] if p['id'] != a.id] + [entry]
+    # "Bring to Life" assets: lights/flames are detected automatically; add a plan in imported.py
+    # (fireworks, trees, garlands, and PROTECT rectangles for every person) for the best result.
+    from imported import build as build_anim
+    build_anim(a.id)
+    entry.update({'fx': f'/paintings/{a.id}/fx.png', 'motion': f'/paintings/{a.id}/motion.png', 'anim': f'/paintings/{a.id}/anim.json'})
+    ids = [p['id'] for p in catalog['paintings']]
+    if a.id in ids: catalog['paintings'][ids.index(a.id)] = entry   # re-import keeps its place
+    else: catalog['paintings'].append(entry)
     order = {c['id']: i for i, c in enumerate(catalog['categories'])}
     catalog['paintings'].sort(key=lambda p: order.get(p['category'], 99))  # stable: keeps order within a category
     json.dump(catalog, open(cat_path, 'w'), indent=1, ensure_ascii=False)

@@ -38,6 +38,46 @@ Realism (`paintingMaterial.js`, `lightEstimator.js`):
 
 ---
 
+## Living Canvas — "Bring to Life ✨"
+
+In AR, a floating **Bring to Life ✨** button turns the selected painting into a living one. Tap it again (**Pause ❚❚**) to return to the static painting. Every painting has its **own prepared animation**, built from what is actually in it and loaded together with the painting, so it starts instantly. Nothing is generated when the button is tapped.
+
+**On the painting itself.** The painting's own pixels move inside per-painting masks, in `paintingMaterial.js`:
+- diya flames flicker and dance independently;
+- string lights blink and chase along each string;
+- stars and glints twinkle;
+- garlands and leaves sway, and water ripples;
+- hanging lanterns swing;
+- symmetric painted chakras rotate;
+- light rays turn slowly behind deities.
+
+**Out of the canvas.** 3D effects are anchored to the tracked canvas and travel toward the viewer, in `fxLayer.js`:
+- fireworks burst outward with trails;
+- birds fly out of trees;
+- fuljhadi sparks and circular light trails;
+- embers rise from diyas;
+- petals float out of garlands and rangolis;
+- golden dust circles the divine paintings.
+
+Particles fade out before getting close to the phone.
+
+**Seamless.** Every effect scales with one intensity value that ramps from 0 to 1, so the first animated frame is pixel-identical to the static painting, and pausing returns to it exactly.
+
+**People and deities are never altered.** Each painting's plan has *protected* rectangles: no warp, glow, flicker or particle source is ever placed inside them. `fxmaps.py` enforces this. Faces are not animated at all; no blinking or limb movement is synthesised, because that cannot be done without risking distortion.
+
+Each painting folder holds its animation assets: `fx.png` (lights and flames), `motion.png` (sway, ripple and swing masks) and `anim.json` (3D effects and halos). An optional `animated.mp4` (a pre-rendered clip whose first frame is the painting) is cross-faded in automatically when present.
+
+| Build step | Command |
+|---|---|
+| Procedural paintings' animations | `python tools/paintings/build_animations.py` |
+| Premium powder and flower rangolis | `python tools/paintings/build_rangolis.py` |
+| Imported art (Skets etc.): detect lights, apply hand-checked plans | `python tools/paintings/imported.py` |
+| Re-assemble the catalog | `python tools/paintings/assemble_catalog.py` |
+
+`ARTWORK-PROMPTS.md` holds the prompts for the human-scene and divine paintings to be generated and then added.
+
+---
+
 ## 2. Quick start (local)
 
 Requirements: **Node 18.17+**. Python 3.10+ is only needed to rebuild the gallery or run the tests.
@@ -215,6 +255,7 @@ public/
   js/paintingMaterial.js  Painted-canvas shader + texture cache
   js/lightEstimator.js    Room-light estimation from the known print
   js/targetCompiler.js    In-browser .mind compiler (admin + CLI)
+  js/fxLayer.js           Living Canvas 3D effects (fireworks, birds, sparks, petals, dust)
   js/admin.js       Admin logic
   paintings/        catalog.json + 30 paintings
   vendor/           three.js r160, MindAR 1.2.5 (self-hosted)

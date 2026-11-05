@@ -10,6 +10,10 @@
 //   • soft inner shadow where the stretcher frame meets the surface
 //   • camera-matched softness (mip bias) and sensor grain so it doesn't look "too clean"
 //   • painterly reveal transition between two paintings (noise-driven brush wipe)
+//   • LIVING CANVAS: per-painting effect maps animate the painting's own pixels — flames
+//     flicker, bulbs blink, stars twinkle, leaves/garlands sway, water ripples, lanterns swing,
+//     painted chakras rotate. All effects scale with uAnim (0→1), so the first animated frame
+//     is pixel-identical to the static painting and stopping returns to it exactly.
 import * as THREE from 'three';
 
 const vert = /* glsl */ `
@@ -45,6 +49,17 @@ const frag = /* glsl */ `
   uniform float mipBias;
   uniform float grainAmt;
   uniform float time;
+  // ---- Living Canvas (animation) ----
+  uniform float uAnim;          // 0 = static painting, 1 = fully alive (ramped → seamless start/stop)
+  uniform float animTime;       // seconds since the animation was switched on
+  uniform sampler2D fxMap;      // R emitter strength, G phase, B kind (flame/blink/twinkle/breath)
+  uniform sampler2D motionMap;  // R foliage sway, G water ripple, B pendulum swing (0 pivot → 1 tip)
+  uniform float hasFx;
+  uniform vec4 halos[3];        // centre (uv), r0, r1 (fractions of canvas height) — rotating rings
+  uniform float haloSpeed[3];   // rad/s
+  uniform float canvasAspect;   // width / height
+  uniform sampler2D videoMap;   // optional pre-rendered animated version (mp4); first frame == painting
+  uniform float videoMix;
   varying vec2 vUv;
   varying vec3 vViewDirObj;
 
@@ -74,27 +89,84 @@ const frag = /* glsl */ `
     return normalize(vec3((l - r) * relief, (d - u) * relief, 1.0));
   }
 
+  // Rotate the painting's own pixels inside an annulus (a painted chakra / halo turns in place).
+  // Returns rotated uv in .xy and blend weight in .z (feathered annulus × animation intensity).
+  vec3 haloWarp(vec2 uv) {
+    for (int i = 0; i < 3; i++) {
+      vec4 h = halos[i];
+      if (h.w <= 0.0 || h.z < 0.0) continue;   // r0 < 0 marks a light-ray halo (see divineRays)
+      vec2 d = (uv - h.xy) * vec2(canvasAspect, 1.0);
+      float r = length(d);
+      float w = smoothstep(h.z, h.z + 0.015, r) * (1.0 - smoothstep(h.w - 0.015, h.w, r));
+      if (w <= 0.0) continue;
+      float a = haloSpeed[i] * animTime;
+      float c = cos(a), sn = sin(a);
+      vec2 rd = vec2(c * d.x - sn * d.y, sn * d.x + c * d.y);
+      return vec3(h.xy + rd / vec2(canvasAspect, 1.0), w * uAnim);
+    }
+    return vec3(uv, 0.0);
+  }
+
+  // Rotating divine light rays (additive), starting outside radius |r0| so they never cover the
+  // deity; used where the painted ring itself is not symmetric enough to rotate.
+  float divineRays(vec2 uv) {
+    float acc = 0.0;
+    for (int i = 0; i < 3; i++) {
+      vec4 h = halos[i];
+      if (h.w <= 0.0 || h.z >= 0.0) continue;
+      vec2 d = (uv - h.xy) * vec2(canvasAspect, 1.0);
+      float r = length(d);
+      float r0 = -h.z;
+      float band = smoothstep(r0, r0 + 0.05, r) * (1.0 - smoothstep(h.w * 0.7, h.w, r));
+      float ang = atan(d.y, d.x);
+      float rays = pow(abs(sin(ang * 12.0 + haloSpeed[i] * animTime)), 18.0) + 0.6 * pow(abs(sin(ang * 7.0 - haloSpeed[i] * 0.7 * animTime)), 24.0);
+      acc += rays * band;
+    }
+    return acc;
+  }
+
   void main() {
-    vec2 uv = vUv;
     // uv.y = 0 at bottom in three PlaneGeometry; textures are flipY'd so this is upright.
+    vec2 uv = vUv;
+
+    // --- Living Canvas: gently warp the painting's own pixels inside the motion masks.
+    //     Masks never cover faces, so faces are never moved or distorted.
+    vec3 mo = vec3(0.0); vec4 fx = vec4(0.0);
+    if (uAnim > 0.001 && hasFx > 0.5) {
+      mo = texture2D(motionMap, vUv).rgb;
+      fx = texture2D(fxMap, vUv);
+      float t = time;
+      vec2 w = vec2(0.0);
+      w.x += mo.r * (sin(t * 1.7 + vUv.y * 9.0 + vUv.x * 4.0) * 0.0022 + sin(t * 3.1 + vUv.x * 23.0) * 0.0008); // leaves / garlands
+      w.y += mo.r * sin(t * 2.3 + vUv.x * 13.0) * 0.0009;
+      w += mo.g * vec2(sin(t * 1.3 + vUv.y * 260.0) * 0.0016, sin(t * 2.0 + vUv.x * 90.0 + vUv.y * 140.0) * 0.0009); // water
+      w.x += mo.b * sin(t * 1.6 + vUv.x * 6.0) * 0.006;                                                            // hanging lanterns
+      float isFlame = fx.r * (1.0 - smoothstep(0.30, 0.34, fx.b));
+      w.x += isFlame * sin(t * 11.0 + fx.g * 40.0 + vUv.y * 160.0) * 0.0016;                                       // flames dance
+      w.y += isFlame * sin(t * 7.0 + fx.g * 23.0) * 0.0012;
+      uv = vUv + w * uAnim;
+    }
+    vec3 hw = uAnim > 0.001 ? haloWarp(uv) : vec3(uv, 0.0);
 
     // --- painterly reveal mask -------------------------------------------------
-    float n = fbm(uv * vec2(6.0, 4.5)) * 0.55 + fbm(uv * vec2(40.0, 30.0)) * 0.2;
-    float sweep = (uv.x * 0.6 + (1.0 - uv.y) * 0.25);
+    float n = fbm(vUv * vec2(6.0, 4.5)) * 0.55 + fbm(vUv * vec2(40.0, 30.0)) * 0.2;
+    float sweep = (vUv.x * 0.6 + (1.0 - vUv.y) * 0.25);
     float m = smoothstep(reveal * 1.6 - 0.35, reveal * 1.6 - 0.25, sweep * 0.55 + n * 0.75);
     float mixB = 1.0 - m;
     if (reveal >= 0.999) mixB = 1.0;
     if (reveal <= 0.001) mixB = 0.0;
 
-    vec4 ca = texture2D(mapA, uv, mipBias);
+    vec4 ca = texture2D(mapA, vUv, mipBias);
     vec4 cb = texture2D(mapB, uv, mipBias);
+    if (hw.z > 0.001) cb.rgb = mix(cb.rgb, texture2D(mapB, hw.xy, mipBias).rgb, hw.z);
+    if (videoMix > 0.001) cb.rgb = mix(cb.rgb, texture2D(videoMap, vUv).rgb, videoMix);
     vec3 albedo = mix(ca.rgb, cb.rgb, mixB);
-    vec3 nA = impastoNormal(heightA, uv, texelA);
-    vec3 nB = impastoNormal(heightB, uv, texelB);
+    vec3 nA = impastoNormal(heightA, vUv, texelA);
+    vec3 nB = impastoNormal(heightB, vUv, texelB);
     vec3 N = normalize(mix(nA, nB, mixB));
 
     // --- canvas weave (plain weave, over/under) -------------------------------
-    vec2 t = uv * sizeCm * threadsPerCm;
+    vec2 t = vUv * sizeCm * threadsPerCm;
     vec2 fw = fwidth(t);
     float aa = 1.0 - smoothstep(0.25, 0.6, max(fw.x, fw.y)); // fade when threads < ~2px
     vec2 cell = floor(t);
@@ -102,13 +174,10 @@ const frag = /* glsl */ `
     vec2 ft = fract(t);
     float hx = sin(ft.x * 3.14159), hy = sin(ft.y * 3.14159);
     float wv = mix(hy * (0.6 + 0.4 * hx), hx * (0.6 + 0.4 * hy), parity);
-    // Thread slubs: tiny irregularity so the weave isn't a perfect grid.
     float slub = vnoise(t * 0.37) * 0.5 + 0.5;
-    // Analytic weave gradient in uv space
     float gx = mix(hy * 0.4 * cos(ft.x * 3.14159) * 3.14159, cos(ft.x * 3.14159) * 3.14159 * (0.6 + 0.4 * hy), parity);
     float gy = mix(cos(ft.y * 3.14159) * 3.14159 * (0.6 + 0.4 * hx), hx * 0.4 * cos(ft.y * 3.14159) * 3.14159, parity);
-    // Paint fills the weave where it's thick (impasto), so weave shows most in thin areas.
-    float thick = mix(texture2D(heightA, uv).r, texture2D(heightB, uv).r, mixB);
+    float thick = mix(texture2D(heightA, vUv).r, texture2D(heightB, vUv).r, mixB);
     float weaveVis = weaveAmt * aa * (1.0 - 0.6 * smoothstep(0.55, 0.9, thick)) * (0.75 + 0.25 * slub);
     N = normalize(N + vec3(-gx, -gy, 0.0) * 0.12 * weaveVis);
 
@@ -116,18 +185,42 @@ const frag = /* glsl */ `
     vec3 L = normalize(lightDir);
     vec3 V = normalize(vViewDirObj);
     float ndl = dot(N, L), flat_ndl = L.z;
-    float shade = 1.0 + 1.15 * (ndl - flat_ndl);              // relative: flat areas keep albedo
-    shade *= 1.0 - 0.06 * weaveVis * (1.0 - wv);             // thread valleys catch less light
+    float shade = 1.0 + 1.15 * (ndl - flat_ndl);
+    shade *= 1.0 - 0.06 * weaveVis * (1.0 - wv);
     vec3 H = normalize(L + V);
     float spec = pow(max(dot(N, H), 0.0), 38.0) * specAmt * (0.4 + 0.6 * thick);
 
-    // Inner shadow along the frame / stretcher edge (~1.2 cm) + gentle edge falloff.
-    vec2 dcm = min(uv, 1.0 - uv) * sizeCm;
+    vec2 dcm = min(vUv, 1.0 - vUv) * sizeCm;
     float edge = min(dcm.x, dcm.y);
     float ao = mix(0.72, 1.0, smoothstep(0.0, 1.4, edge)) * mix(0.94, 1.0, smoothstep(0.0, 9.0, edge));
 
-    vec3 E = illumAt(uv);
+    vec3 E = illumAt(vUv);
     vec3 col = albedo * shade * ao * E + spec * E;
+
+    // --- Living Canvas: light emitters (diya flames, bulbs, stars, divine glow) ---
+    if (uAnim > 0.001 && hasFx > 0.5 && fx.r > 0.004 && videoMix < 0.5) {
+      float tt = time, ph = fx.g * 6.2831;
+      float k = fx.b;
+      float e = fx.r * uAnim * mixB;
+      if (k < 0.32) {               // flame: organic flicker + warm bloom
+        float f = 0.86 + 0.14 * sin(tt * 9.0 + ph * 3.0) * sin(tt * 13.7 + ph) + 0.16 * (vnoise(vec2(tt * 6.0, ph * 9.0)) - 0.5);
+        col *= mix(1.0, f, e);
+        col += vec3(1.0, 0.62, 0.22) * e * (0.08 + 0.12 * f) * E;
+      } else if (k < 0.58) {        // bulb: soft on/off chase along each light string
+        float c = fract(tt * 0.5 + fx.g);
+        float on = smoothstep(0.30, 0.42, c) * (1.0 - smoothstep(0.88, 1.0, c));
+        col *= mix(1.0, mix(0.5, 1.12, on), e);
+        col += vec3(1.0, 0.8, 0.45) * e * on * 0.14 * E;
+      } else if (k < 0.82) {        // star / sparkle: sharp twinkle
+        float tw = pow(max(0.0, sin(tt * 2.6 + ph * 7.0)), 10.0);
+        col += vec3(1.0, 0.95, 0.85) * e * tw * 0.5;
+      } else {                      // divine / ambient glow: slow breathing
+        float b = 0.5 + 0.5 * sin(tt * 1.4 + ph);
+        col += vec3(1.0, 0.82, 0.45) * e * (0.05 + 0.11 * b) * E;
+      }
+    }
+
+    if (uAnim > 0.001) col += vec3(1.0, 0.8, 0.42) * divineRays(vUv) * 0.16 * uAnim * mixB * E;
 
     // Camera sensor grain (very low, temporally varying) so the overlay shares the feed's noise.
     float g = hash(gl_FragCoord.xy + fract(time * 13.7) * 91.0) - 0.5;
@@ -141,6 +234,8 @@ const frag = /* glsl */ `
 export function createPaintingMaterial({ widthCm, heightCm }) {
   const blank = new THREE.DataTexture(new Uint8Array([128, 128, 128, 255]), 1, 1);
   blank.needsUpdate = true;
+  const black = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
+  black.needsUpdate = true;
   const illum = Array.from({ length: 9 }, () => new THREE.Vector3(1, 1, 1));
   const mat = new THREE.ShaderMaterial({
     vertexShader: vert,
@@ -167,13 +262,22 @@ export function createPaintingMaterial({ widthCm, heightCm }) {
       mipBias: { value: 0.35 },
       grainAmt: { value: 0.022 },
       time: { value: 0 },
+      uAnim: { value: 0 }, animTime: { value: 0 },
+      fxMap: { value: black }, motionMap: { value: black }, hasFx: { value: 0 },
+      halos: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] },
+      haloSpeed: { value: [0, 0, 0] },
+      canvasAspect: { value: widthCm / heightCm },
+      videoMap: { value: blank }, videoMix: { value: 0 },
     },
   });
+  mat.userData.black = black;
   return mat;
 }
 
 // ---------------------------------------------------------------------------------
 // Texture loading with a small LRU so switching paintings is instant after first view.
+// Each painting's animation assets (fx map, motion map, animation manifest) are loaded together
+// with the painting, so "Bring to Life" starts instantly — nothing is generated on click.
 const loader = new THREE.TextureLoader();
 const cache = new Map();
 const MAX_CACHE = 6;
@@ -186,10 +290,14 @@ export function loadPaintingTextures(painting, renderer) {
     return v;
   }
   const maxAniso = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+  const optional = (url) => (url ? loader.loadAsync(url).catch(() => null) : Promise.resolve(null));
   const p = Promise.all([
     loader.loadAsync(painting.albedo),
     loader.loadAsync(painting.height),
-  ]).then(([albedo, height]) => {
+    optional(painting.fx),
+    optional(painting.motion),
+    painting.anim ? fetch(painting.anim).then((r) => (r.ok ? r.json() : null)).catch(() => null) : Promise.resolve(null),
+  ]).then(([albedo, height, fx, motion, anim]) => {
     albedo.colorSpace = THREE.SRGBColorSpace;
     albedo.anisotropy = Math.min(8, maxAniso);
     albedo.generateMipmaps = true;
@@ -197,13 +305,18 @@ export function loadPaintingTextures(painting, renderer) {
     height.colorSpace = THREE.NoColorSpace;
     height.minFilter = THREE.LinearFilter;
     height.generateMipmaps = false;
-    return { albedo, height, texel: new THREE.Vector2(1 / height.image.width, 1 / height.image.height) };
+    for (const t of [fx, motion]) {
+      if (!t) continue;
+      t.colorSpace = THREE.NoColorSpace; t.generateMipmaps = false;
+      t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter;
+    }
+    return { albedo, height, fx, motion, anim, texel: new THREE.Vector2(1 / height.image.width, 1 / height.image.height) };
   });
   cache.set(key, p);
   if (cache.size > MAX_CACHE) {
     const [oldKey, oldP] = cache.entries().next().value;
     cache.delete(oldKey);
-    oldP.then((t) => { t.albedo.dispose(); t.height.dispose(); }).catch(() => {});
+    oldP.then((t) => { for (const k of ['albedo', 'height', 'fx', 'motion']) t[k]?.dispose(); }).catch(() => {});
   }
   p.catch(() => cache.delete(key));
   return p;
