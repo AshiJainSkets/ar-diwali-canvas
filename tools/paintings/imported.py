@@ -99,6 +99,8 @@ def detect_lights(img, protect, max_n=420):
 
 def build(pid):
     d = os.path.join(OUT, pid)
+    if os.path.exists(os.path.join(d, 'animated.mp4')):   # its own GIF animation is used instead
+        return [], fxmaps.build(d, [], (), seed=0)
     img = cv2.imread(os.path.join(d, 'albedo.jpg'))
     plan = PLANS.get(pid, dict(add=[], protect=[]))
     if plan.get('faces', True):  # also auto-protect any detected face (expanded) — belt and braces

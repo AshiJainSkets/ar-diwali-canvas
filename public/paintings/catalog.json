@@ -60,7 +60,8 @@
    "thumb": "/paintings/skets-2/thumb.jpg",
    "fx": "/paintings/skets-2/fx.png",
    "motion": "/paintings/skets-2/motion.png",
-   "anim": "/paintings/skets-2/anim.json"
+   "anim": "/paintings/skets-2/anim.json",
+   "video": "/paintings/skets-2/animated.mp4"
   },
   {
    "id": "skets-3",
@@ -74,7 +75,8 @@
    "thumb": "/paintings/skets-3/thumb.jpg",
    "fx": "/paintings/skets-3/fx.png",
    "motion": "/paintings/skets-3/motion.png",
-   "anim": "/paintings/skets-3/anim.json"
+   "anim": "/paintings/skets-3/anim.json",
+   "video": "/paintings/skets-3/animated.mp4"
   },
   {
    "id": "skets-4",

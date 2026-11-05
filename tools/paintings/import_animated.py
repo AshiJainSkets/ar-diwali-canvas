@@ -148,5 +148,93 @@ def main(only=None):
     json.dump(catalog, open(cat_path, 'w'), indent=1, ensure_ascii=False)
 
 
+
+
+# ---------------------------------------------------------------------------------------------
+# GIFs made from a painting that is already in the app (e.g. Skets Studio). The GIF was generated
+# from the app's own canvas image, so it is registered to it (sub-pixel offset measured once).
+# People are protected:
+#   • the main person is cut out precisely (`<id>-person.png`, GrabCut + head region, checked by eye)
+#     and is ALWAYS the original painting — nothing from the GIF is used on them (the Skets 2 GIF,
+#     for example, adds lights onto the saree that are not in the painting; those are rejected);
+#   • inside the other protected rectangles (small background figures) the GIF is used only where
+#     the original painting already has a light (string lights / diyas passing behind someone).
+EXISTING = {
+    # id: (gif, gif→canvas offset in GIF px (dx, dy) measured by phase correlation)
+    'skets-2': ('skets-2.gif', (-0.51, 0.01)),
+    'skets-3': ('skets-3.gif', (-0.50, 0.01)),
+}
+
+
+def light_mask(bgr):
+    """Pixels of the ORIGINAL painting that are light sources: very bright, warm or white, small,
+    strongly brighter than their surroundings (fabric folds and highlights are large / low contrast)."""
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+    Hh, S, V = hsv[..., 0].astype(np.int32), hsv[..., 1].astype(np.int32), hsv[..., 2].astype(np.float32)
+    local = V - cv2.GaussianBlur(V, (0, 0), 6)
+    m = ((V > 235) & (local > 30) & (((Hh >= 4) & (Hh <= 40)) | (S < 60))).astype(np.uint8)
+    n, lab, st, _ = cv2.connectedComponentsWithStats(m, 8)
+    small = np.zeros_like(m)
+    for i in range(1, n):
+        if st[i, 4] <= 150 and st[i, 2] <= 30 and st[i, 3] <= 30:
+            small[lab == i] = 1
+    small = cv2.dilate(small, np.ones((7, 7), np.uint8))
+    return cv2.GaussianBlur(small.astype(np.float32), (0, 0), 2)
+
+
+def attach_gif(pid):
+    import imported
+    gif, (dx, dy) = EXISTING[pid]
+    d = os.path.join(OUT, pid)
+    albedo = cv2.imread(os.path.join(d, 'albedo.jpg')).astype(np.float32)          # 1600×1200 BGR
+    frames = [np.asarray(f.convert('RGB'))[..., ::-1].astype(np.float32) for f in ImageSequence.Iterator(Image.open(os.path.join(SRC, gif)))]
+    gh, gw = frames[0].shape[:2]
+    F0 = frames[0]
+    # real motion only (GIF re-dithering flickers everywhere; blur before measuring)
+    B0 = cv2.GaussianBlur(F0, (0, 0), 1.2)
+    var = np.max([np.abs(cv2.GaussianBlur(f, (0, 0), 1.2) - B0).max(axis=2) for f in frames], axis=0)
+    mot = cv2.GaussianBlur(cv2.dilate((var > 10).astype(np.uint8), np.ones((3, 3), np.uint8)).astype(np.float32), (0, 0), 1.0)[..., None]
+    s = W / gw
+    M = np.float32([[s, 0, (0.5 + dx) * s - 0.5], [0, H / gh, (0.5 + dy) * (H / gh) - 0.5]])
+    up = lambda a: cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    # protection multiplier on the canvas
+    person = (cv2.imread(os.path.join(SRC, f'{pid}-person.png'), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
+    person = cv2.GaussianBlur(cv2.dilate(person, np.ones((17, 17), np.uint8)).astype(np.float32), (0, 0), 4)
+    P = np.zeros((H, W), np.float32)
+    for (x0, y0, x1, y1) in imported.PLANS[pid]['protect']:
+        cv2.rectangle(P, (int(x0), int(y0)), (int(x1), int(y1)), 1.0, -1)
+    P = cv2.GaussianBlur(P, (0, 0), 6)
+    allow = light_mask(albedo.astype(np.uint8))
+    mult = ((1 - P) + P * allow) * (1 - np.clip(person * 1.15, 0, 1))
+    mult = mult[..., None]
+    tmp = tempfile.mkdtemp()
+    try:
+        n, L = 0, len(frames)
+        deltas = [up((f - F0) * mot) * mult for f in frames]
+        for i in range(L):
+            a, b = deltas[i], deltas[(i + 1) % L]
+            for k in range(SUB):
+                t = k / SUB
+                fr = np.clip(albedo + a * (1 - t) + b * t, 0, 255).astype(np.uint8)
+                cv2.imwrite(os.path.join(tmp, f'{n:04d}.png'), cv2.resize(fr, (VW, VH), interpolation=cv2.INTER_AREA))
+                n += 1
+        out = os.path.join(d, 'animated.mp4')
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS), '-i', os.path.join(tmp, '%04d.png'),
+                        '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p',
+                        '-c:v', 'libx264', '-profile:v', 'main', '-preset', 'slow', '-crf', '21', '-g', str(FPS),
+                        '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
+                        '-movflags', '+faststart', '-an', out], check=True)
+    finally:
+        shutil.rmtree(tmp)
+    fxmaps.build(d, [], (), seed=0)   # the painting's own GIF animation replaces the procedural effects
+    print(f'{pid}: GIF video {n} frames, {os.path.getsize(out)/1e6:.2f} MB')
+    return mult[..., 0]
+
+
 if __name__ == '__main__':
-    main(set(sys.argv[1:]) or None)
+    args = set(sys.argv[1:])
+    for pid in [p for p in EXISTING if not args or p in args]:
+        attach_gif(pid)
+    rest = {i[0] for i in ITEMS} & args if args else None
+    if not args or rest:
+        main(rest)
