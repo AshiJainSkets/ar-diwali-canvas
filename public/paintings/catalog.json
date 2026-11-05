@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "canvasAspect": "4:3",
  "categories": [
   {
@@ -15,17 +15,17 @@
   {
    "id": "rangoli",
    "name": "Diwali Rangoli Art",
-   "description": "Radiant floor art of petals, powders and dots."
+   "description": "Intricate powder rangolis: mandala, lotus, peacock, diya and geometric designs."
   },
   {
-   "id": "lakshmi",
-   "name": "Goddess Lakshmi Inspired",
-   "description": "Lotus, gold and footsteps of prosperity."
+   "id": "flower-rangoli",
+   "name": "Original Flower Rangolis",
+   "description": "Real marigold, rose, jasmine and lotus petal arrangements."
   },
   {
-   "id": "ganesha",
-   "name": "Lord Ganesha Artwork",
-   "description": "Vighnaharta, remover of obstacles, in line and light."
+   "id": "divine",
+   "name": "Gods & Divine Art",
+   "description": "Goddess Lakshmi and Lord Ganesha in light and devotion."
   },
   {
    "id": "diya",
@@ -41,21 +41,6 @@
    "id": "rajasthani",
    "name": "Royal Rajasthani Diwali",
    "description": "Palaces, jharokhas and caparisoned elephants."
-  },
-  {
-   "id": "abstract",
-   "name": "Modern Abstract Diwali",
-   "description": "Contemporary colour fields and geometry of flame."
-  },
-  {
-   "id": "folk",
-   "name": "Traditional Indian Folk Art",
-   "description": "Warli, Madhubani and Gond interpretations."
-  },
-  {
-   "id": "gold",
-   "name": "Luxury Gold Diwali",
-   "description": "Gilded mandalas, emerald and gold leaf."
   }
  ],
  "paintings": [
@@ -68,7 +53,10 @@
    "albedo": "/paintings/skets-1/albedo.jpg",
    "height": "/paintings/skets-1/height.jpg",
    "preview": "/paintings/skets-1/preview.jpg",
-   "thumb": "/paintings/skets-1/thumb.jpg"
+   "thumb": "/paintings/skets-1/thumb.jpg",
+   "fx": "/paintings/skets-1/fx.png",
+   "motion": "/paintings/skets-1/motion.png",
+   "anim": "/paintings/skets-1/anim.json"
   },
   {
    "id": "skets-2",
@@ -79,7 +67,10 @@
    "albedo": "/paintings/skets-2/albedo.jpg",
    "height": "/paintings/skets-2/height.jpg",
    "preview": "/paintings/skets-2/preview.jpg",
-   "thumb": "/paintings/skets-2/thumb.jpg"
+   "thumb": "/paintings/skets-2/thumb.jpg",
+   "fx": "/paintings/skets-2/fx.png",
+   "motion": "/paintings/skets-2/motion.png",
+   "anim": "/paintings/skets-2/anim.json"
   },
   {
    "id": "skets-3",
@@ -90,7 +81,10 @@
    "albedo": "/paintings/skets-3/albedo.jpg",
    "height": "/paintings/skets-3/height.jpg",
    "preview": "/paintings/skets-3/preview.jpg",
-   "thumb": "/paintings/skets-3/thumb.jpg"
+   "thumb": "/paintings/skets-3/thumb.jpg",
+   "fx": "/paintings/skets-3/fx.png",
+   "motion": "/paintings/skets-3/motion.png",
+   "anim": "/paintings/skets-3/anim.json"
   },
   {
    "id": "skets-4",
@@ -101,7 +95,10 @@
    "albedo": "/paintings/skets-4/albedo.jpg",
    "height": "/paintings/skets-4/height.jpg",
    "preview": "/paintings/skets-4/preview.jpg",
-   "thumb": "/paintings/skets-4/thumb.jpg"
+   "thumb": "/paintings/skets-4/thumb.jpg",
+   "fx": "/paintings/skets-4/fx.png",
+   "motion": "/paintings/skets-4/motion.png",
+   "anim": "/paintings/skets-4/anim.json"
   },
   {
    "id": "skets-5",
@@ -112,7 +109,10 @@
    "albedo": "/paintings/skets-5/albedo.jpg",
    "height": "/paintings/skets-5/height.jpg",
    "preview": "/paintings/skets-5/preview.jpg",
-   "thumb": "/paintings/skets-5/thumb.jpg"
+   "thumb": "/paintings/skets-5/thumb.jpg",
+   "fx": "/paintings/skets-5/fx.png",
+   "motion": "/paintings/skets-5/motion.png",
+   "anim": "/paintings/skets-5/anim.json"
   },
   {
    "id": "skets-6",
@@ -123,7 +123,10 @@
    "albedo": "/paintings/skets-6/albedo.jpg",
    "height": "/paintings/skets-6/height.jpg",
    "preview": "/paintings/skets-6/preview.jpg",
-   "thumb": "/paintings/skets-6/thumb.jpg"
+   "thumb": "/paintings/skets-6/thumb.jpg",
+   "fx": "/paintings/skets-6/fx.png",
+   "motion": "/paintings/skets-6/motion.png",
+   "anim": "/paintings/skets-6/anim.json"
   },
   {
    "id": "traditional-1",
@@ -134,7 +137,10 @@
    "albedo": "/paintings/traditional-1/albedo.jpg",
    "height": "/paintings/traditional-1/height.jpg",
    "preview": "/paintings/traditional-1/preview.jpg",
-   "thumb": "/paintings/traditional-1/thumb.jpg"
+   "thumb": "/paintings/traditional-1/thumb.jpg",
+   "fx": "/paintings/traditional-1/fx.png",
+   "motion": "/paintings/traditional-1/motion.png",
+   "anim": "/paintings/traditional-1/anim.json"
   },
   {
    "id": "traditional-2",
@@ -145,7 +151,10 @@
    "albedo": "/paintings/traditional-2/albedo.jpg",
    "height": "/paintings/traditional-2/height.jpg",
    "preview": "/paintings/traditional-2/preview.jpg",
-   "thumb": "/paintings/traditional-2/thumb.jpg"
+   "thumb": "/paintings/traditional-2/thumb.jpg",
+   "fx": "/paintings/traditional-2/fx.png",
+   "motion": "/paintings/traditional-2/motion.png",
+   "anim": "/paintings/traditional-2/anim.json"
   },
   {
    "id": "traditional-3",
@@ -156,106 +165,220 @@
    "albedo": "/paintings/traditional-3/albedo.jpg",
    "height": "/paintings/traditional-3/height.jpg",
    "preview": "/paintings/traditional-3/preview.jpg",
-   "thumb": "/paintings/traditional-3/thumb.jpg"
+   "thumb": "/paintings/traditional-3/thumb.jpg",
+   "fx": "/paintings/traditional-3/fx.png",
+   "motion": "/paintings/traditional-3/motion.png",
+   "anim": "/paintings/traditional-3/anim.json"
   },
   {
-   "id": "rangoli-1",
+   "id": "rangoli-mandala",
    "category": "rangoli",
-   "title": "Lotus Mandala Rangoli",
-   "description": "A sixteen-lamp rangoli on a terracotta courtyard.",
-   "medium": "Textured acrylic",
-   "albedo": "/paintings/rangoli-1/albedo.jpg",
-   "height": "/paintings/rangoli-1/height.jpg",
-   "preview": "/paintings/rangoli-1/preview.jpg",
-   "thumb": "/paintings/rangoli-1/thumb.jpg"
+   "title": "Royal Mandala Rangoli",
+   "description": "A sixteen-fold mandala in ruby, royal blue and gold powder.",
+   "medium": "Coloured rangoli powder",
+   "albedo": "/paintings/rangoli-mandala/albedo.jpg",
+   "height": "/paintings/rangoli-mandala/height.jpg",
+   "preview": "/paintings/rangoli-mandala/preview.jpg",
+   "thumb": "/paintings/rangoli-mandala/thumb.jpg",
+   "fx": "/paintings/rangoli-mandala/fx.png",
+   "motion": "/paintings/rangoli-mandala/motion.png",
+   "anim": "/paintings/rangoli-mandala/anim.json"
   },
   {
-   "id": "rangoli-2",
+   "id": "rangoli-lotus",
    "category": "rangoli",
-   "title": "Peacock Rangoli",
-   "description": "Peacocks guard a jewel-toned rangoli strewn with petals.",
-   "medium": "Acrylic on canvas",
-   "albedo": "/paintings/rangoli-2/albedo.jpg",
-   "height": "/paintings/rangoli-2/height.jpg",
-   "preview": "/paintings/rangoli-2/preview.jpg",
-   "thumb": "/paintings/rangoli-2/thumb.jpg"
+   "title": "Lotus Blossom Rangoli",
+   "description": "A layered lotus within a jewelled octagon.",
+   "medium": "Coloured rangoli powder",
+   "albedo": "/paintings/rangoli-lotus/albedo.jpg",
+   "height": "/paintings/rangoli-lotus/height.jpg",
+   "preview": "/paintings/rangoli-lotus/preview.jpg",
+   "thumb": "/paintings/rangoli-lotus/thumb.jpg",
+   "fx": "/paintings/rangoli-lotus/fx.png",
+   "motion": "/paintings/rangoli-lotus/motion.png",
+   "anim": "/paintings/rangoli-lotus/anim.json"
   },
   {
-   "id": "rangoli-3",
+   "id": "rangoli-peacock",
    "category": "rangoli",
-   "title": "Kolam Garden",
-   "description": "Interlacing rangolis framed by a dotted kolam border.",
-   "medium": "Gouache-style acrylic",
-   "albedo": "/paintings/rangoli-3/albedo.jpg",
-   "height": "/paintings/rangoli-3/height.jpg",
-   "preview": "/paintings/rangoli-3/preview.jpg",
-   "thumb": "/paintings/rangoli-3/thumb.jpg"
+   "title": "Mayur Peacock Rangoli",
+   "description": "Six peacocks fan their tails around a lotus medallion.",
+   "medium": "Coloured rangoli powder",
+   "albedo": "/paintings/rangoli-peacock/albedo.jpg",
+   "height": "/paintings/rangoli-peacock/height.jpg",
+   "preview": "/paintings/rangoli-peacock/preview.jpg",
+   "thumb": "/paintings/rangoli-peacock/thumb.jpg",
+   "fx": "/paintings/rangoli-peacock/fx.png",
+   "motion": "/paintings/rangoli-peacock/motion.png",
+   "anim": "/paintings/rangoli-peacock/anim.json"
+  },
+  {
+   "id": "rangoli-diya",
+   "category": "rangoli",
+   "title": "Deepam Rangoli",
+   "description": "Eight powder diyas circle a glowing central lamp.",
+   "medium": "Coloured rangoli powder",
+   "albedo": "/paintings/rangoli-diya/albedo.jpg",
+   "height": "/paintings/rangoli-diya/height.jpg",
+   "preview": "/paintings/rangoli-diya/preview.jpg",
+   "thumb": "/paintings/rangoli-diya/thumb.jpg",
+   "fx": "/paintings/rangoli-diya/fx.png",
+   "motion": "/paintings/rangoli-diya/motion.png",
+   "anim": "/paintings/rangoli-diya/anim.json"
+  },
+  {
+   "id": "rangoli-geometric",
+   "category": "rangoli",
+   "title": "Ashtakona Geometric Rangoli",
+   "description": "Interlaced eight-point star geometry with kolam arcs.",
+   "medium": "Coloured rangoli powder",
+   "albedo": "/paintings/rangoli-geometric/albedo.jpg",
+   "height": "/paintings/rangoli-geometric/height.jpg",
+   "preview": "/paintings/rangoli-geometric/preview.jpg",
+   "thumb": "/paintings/rangoli-geometric/thumb.jpg",
+   "fx": "/paintings/rangoli-geometric/fx.png",
+   "motion": "/paintings/rangoli-geometric/motion.png",
+   "anim": "/paintings/rangoli-geometric/anim.json"
+  },
+  {
+   "id": "flower-marigold",
+   "category": "flower-rangoli",
+   "title": "Marigold & Rose Mandala",
+   "description": "Marigold heads, rose petals and jasmine buds on marble.",
+   "medium": "Fresh flower petals",
+   "albedo": "/paintings/flower-marigold/albedo.jpg",
+   "height": "/paintings/flower-marigold/height.jpg",
+   "preview": "/paintings/flower-marigold/preview.jpg",
+   "thumb": "/paintings/flower-marigold/thumb.jpg",
+   "fx": "/paintings/flower-marigold/fx.png",
+   "motion": "/paintings/flower-marigold/motion.png",
+   "anim": "/paintings/flower-marigold/anim.json"
+  },
+  {
+   "id": "flower-lotus",
+   "category": "flower-rangoli",
+   "title": "Rose Lotus with Jasmine",
+   "description": "A lotus of real lotus petals outlined in jasmine on a bed of roses.",
+   "medium": "Fresh flower petals",
+   "albedo": "/paintings/flower-lotus/albedo.jpg",
+   "height": "/paintings/flower-lotus/height.jpg",
+   "preview": "/paintings/flower-lotus/preview.jpg",
+   "thumb": "/paintings/flower-lotus/thumb.jpg",
+   "fx": "/paintings/flower-lotus/fx.png",
+   "motion": "/paintings/flower-lotus/motion.png",
+   "anim": "/paintings/flower-lotus/anim.json"
+  },
+  {
+   "id": "flower-mixed",
+   "category": "flower-rangoli",
+   "title": "Festival Petal Medallion",
+   "description": "Twelve colour sectors of mixed petals with a marigold heart.",
+   "medium": "Fresh flower petals",
+   "albedo": "/paintings/flower-mixed/albedo.jpg",
+   "height": "/paintings/flower-mixed/height.jpg",
+   "preview": "/paintings/flower-mixed/preview.jpg",
+   "thumb": "/paintings/flower-mixed/thumb.jpg",
+   "fx": "/paintings/flower-mixed/fx.png",
+   "motion": "/paintings/flower-mixed/motion.png",
+   "anim": "/paintings/flower-mixed/anim.json"
+  },
+  {
+   "id": "flower-jasmine",
+   "category": "flower-rangoli",
+   "title": "Jasmine Moon Rangoli",
+   "description": "Jasmine and marigold rings around a lotus, lit by diyas.",
+   "medium": "Fresh flower petals",
+   "albedo": "/paintings/flower-jasmine/albedo.jpg",
+   "height": "/paintings/flower-jasmine/height.jpg",
+   "preview": "/paintings/flower-jasmine/preview.jpg",
+   "thumb": "/paintings/flower-jasmine/thumb.jpg",
+   "fx": "/paintings/flower-jasmine/fx.png",
+   "motion": "/paintings/flower-jasmine/motion.png",
+   "anim": "/paintings/flower-jasmine/anim.json"
   },
   {
    "id": "lakshmi-1",
-   "category": "lakshmi",
+   "category": "divine",
    "title": "Lakshmi's Lotus",
    "description": "A radiant lotus rises as gold coins fall like blessings.",
    "medium": "Oil on canvas",
    "albedo": "/paintings/lakshmi-1/albedo.jpg",
    "height": "/paintings/lakshmi-1/height.jpg",
    "preview": "/paintings/lakshmi-1/preview.jpg",
-   "thumb": "/paintings/lakshmi-1/thumb.jpg"
+   "thumb": "/paintings/lakshmi-1/thumb.jpg",
+   "fx": "/paintings/lakshmi-1/fx.png",
+   "motion": "/paintings/lakshmi-1/motion.png",
+   "anim": "/paintings/lakshmi-1/anim.json"
   },
   {
    "id": "lakshmi-2",
-   "category": "lakshmi",
+   "category": "divine",
    "title": "Footsteps of Prosperity",
    "description": "Alta-red footsteps lead through a lamp-lit doorway.",
    "medium": "Acrylic on canvas",
    "albedo": "/paintings/lakshmi-2/albedo.jpg",
    "height": "/paintings/lakshmi-2/height.jpg",
    "preview": "/paintings/lakshmi-2/preview.jpg",
-   "thumb": "/paintings/lakshmi-2/thumb.jpg"
+   "thumb": "/paintings/lakshmi-2/thumb.jpg",
+   "fx": "/paintings/lakshmi-2/fx.png",
+   "motion": "/paintings/lakshmi-2/motion.png",
+   "anim": "/paintings/lakshmi-2/anim.json"
   },
   {
    "id": "lakshmi-3",
-   "category": "lakshmi",
+   "category": "divine",
    "title": "Gaja Lakshmi Abhishek",
    "description": "Royal elephants bathe the sacred lotus in light.",
    "medium": "Oil on canvas",
    "albedo": "/paintings/lakshmi-3/albedo.jpg",
    "height": "/paintings/lakshmi-3/height.jpg",
    "preview": "/paintings/lakshmi-3/preview.jpg",
-   "thumb": "/paintings/lakshmi-3/thumb.jpg"
+   "thumb": "/paintings/lakshmi-3/thumb.jpg",
+   "fx": "/paintings/lakshmi-3/fx.png",
+   "motion": "/paintings/lakshmi-3/motion.png",
+   "anim": "/paintings/lakshmi-3/anim.json"
   },
   {
    "id": "ganesha-1",
-   "category": "ganesha",
+   "category": "divine",
    "title": "Golden Vighnaharta",
    "description": "A gilded line portrait of Ganesha within a mandala halo.",
    "medium": "Gold leaf & acrylic",
    "albedo": "/paintings/ganesha-1/albedo.jpg",
    "height": "/paintings/ganesha-1/height.jpg",
    "preview": "/paintings/ganesha-1/preview.jpg",
-   "thumb": "/paintings/ganesha-1/thumb.jpg"
+   "thumb": "/paintings/ganesha-1/thumb.jpg",
+   "fx": "/paintings/ganesha-1/fx.png",
+   "motion": "/paintings/ganesha-1/motion.png",
+   "anim": "/paintings/ganesha-1/anim.json"
   },
   {
    "id": "ganesha-2",
-   "category": "ganesha",
+   "category": "divine",
    "title": "Om Shri Ganeshaya Namah",
    "description": "A sunburst Om framed by marigold torans.",
    "medium": "Acrylic on canvas",
    "albedo": "/paintings/ganesha-2/albedo.jpg",
    "height": "/paintings/ganesha-2/height.jpg",
    "preview": "/paintings/ganesha-2/preview.jpg",
-   "thumb": "/paintings/ganesha-2/thumb.jpg"
+   "thumb": "/paintings/ganesha-2/thumb.jpg",
+   "fx": "/paintings/ganesha-2/fx.png",
+   "motion": "/paintings/ganesha-2/motion.png",
+   "anim": "/paintings/ganesha-2/anim.json"
   },
   {
    "id": "ganesha-3",
-   "category": "ganesha",
+   "category": "divine",
    "title": "Lamps for Ganapati",
    "description": "Ganesha on a lotus, encircled by diyas and marigolds.",
    "medium": "Oil on canvas",
    "albedo": "/paintings/ganesha-3/albedo.jpg",
    "height": "/paintings/ganesha-3/height.jpg",
    "preview": "/paintings/ganesha-3/preview.jpg",
-   "thumb": "/paintings/ganesha-3/thumb.jpg"
+   "thumb": "/paintings/ganesha-3/thumb.jpg",
+   "fx": "/paintings/ganesha-3/fx.png",
+   "motion": "/paintings/ganesha-3/motion.png",
+   "anim": "/paintings/ganesha-3/anim.json"
   },
   {
    "id": "diya-1",
@@ -266,7 +389,10 @@
    "albedo": "/paintings/diya-1/albedo.jpg",
    "height": "/paintings/diya-1/height.jpg",
    "preview": "/paintings/diya-1/preview.jpg",
-   "thumb": "/paintings/diya-1/thumb.jpg"
+   "thumb": "/paintings/diya-1/thumb.jpg",
+   "fx": "/paintings/diya-1/fx.png",
+   "motion": "/paintings/diya-1/motion.png",
+   "anim": "/paintings/diya-1/anim.json"
   },
   {
    "id": "diya-2",
@@ -277,7 +403,10 @@
    "albedo": "/paintings/diya-2/albedo.jpg",
    "height": "/paintings/diya-2/height.jpg",
    "preview": "/paintings/diya-2/preview.jpg",
-   "thumb": "/paintings/diya-2/thumb.jpg"
+   "thumb": "/paintings/diya-2/thumb.jpg",
+   "fx": "/paintings/diya-2/fx.png",
+   "motion": "/paintings/diya-2/motion.png",
+   "anim": "/paintings/diya-2/anim.json"
   },
   {
    "id": "diya-3",
@@ -288,7 +417,10 @@
    "albedo": "/paintings/diya-3/albedo.jpg",
    "height": "/paintings/diya-3/height.jpg",
    "preview": "/paintings/diya-3/preview.jpg",
-   "thumb": "/paintings/diya-3/thumb.jpg"
+   "thumb": "/paintings/diya-3/thumb.jpg",
+   "fx": "/paintings/diya-3/fx.png",
+   "motion": "/paintings/diya-3/motion.png",
+   "anim": "/paintings/diya-3/anim.json"
   },
   {
    "id": "heritage-1",
@@ -299,7 +431,10 @@
    "albedo": "/paintings/heritage-1/albedo.jpg",
    "height": "/paintings/heritage-1/height.jpg",
    "preview": "/paintings/heritage-1/preview.jpg",
-   "thumb": "/paintings/heritage-1/thumb.jpg"
+   "thumb": "/paintings/heritage-1/thumb.jpg",
+   "fx": "/paintings/heritage-1/fx.png",
+   "motion": "/paintings/heritage-1/motion.png",
+   "anim": "/paintings/heritage-1/anim.json"
   },
   {
    "id": "heritage-2",
@@ -310,7 +445,10 @@
    "albedo": "/paintings/heritage-2/albedo.jpg",
    "height": "/paintings/heritage-2/height.jpg",
    "preview": "/paintings/heritage-2/preview.jpg",
-   "thumb": "/paintings/heritage-2/thumb.jpg"
+   "thumb": "/paintings/heritage-2/thumb.jpg",
+   "fx": "/paintings/heritage-2/fx.png",
+   "motion": "/paintings/heritage-2/motion.png",
+   "anim": "/paintings/heritage-2/anim.json"
   },
   {
    "id": "heritage-3",
@@ -321,7 +459,10 @@
    "albedo": "/paintings/heritage-3/albedo.jpg",
    "height": "/paintings/heritage-3/height.jpg",
    "preview": "/paintings/heritage-3/preview.jpg",
-   "thumb": "/paintings/heritage-3/thumb.jpg"
+   "thumb": "/paintings/heritage-3/thumb.jpg",
+   "fx": "/paintings/heritage-3/fx.png",
+   "motion": "/paintings/heritage-3/motion.png",
+   "anim": "/paintings/heritage-3/anim.json"
   },
   {
    "id": "rajasthani-1",
@@ -332,7 +473,10 @@
    "albedo": "/paintings/rajasthani-1/albedo.jpg",
    "height": "/paintings/rajasthani-1/height.jpg",
    "preview": "/paintings/rajasthani-1/preview.jpg",
-   "thumb": "/paintings/rajasthani-1/thumb.jpg"
+   "thumb": "/paintings/rajasthani-1/thumb.jpg",
+   "fx": "/paintings/rajasthani-1/fx.png",
+   "motion": "/paintings/rajasthani-1/motion.png",
+   "anim": "/paintings/rajasthani-1/anim.json"
   },
   {
    "id": "rajasthani-2",
@@ -343,7 +487,10 @@
    "albedo": "/paintings/rajasthani-2/albedo.jpg",
    "height": "/paintings/rajasthani-2/height.jpg",
    "preview": "/paintings/rajasthani-2/preview.jpg",
-   "thumb": "/paintings/rajasthani-2/thumb.jpg"
+   "thumb": "/paintings/rajasthani-2/thumb.jpg",
+   "fx": "/paintings/rajasthani-2/fx.png",
+   "motion": "/paintings/rajasthani-2/motion.png",
+   "anim": "/paintings/rajasthani-2/anim.json"
   },
   {
    "id": "rajasthani-3",
@@ -354,106 +501,10 @@
    "albedo": "/paintings/rajasthani-3/albedo.jpg",
    "height": "/paintings/rajasthani-3/height.jpg",
    "preview": "/paintings/rajasthani-3/preview.jpg",
-   "thumb": "/paintings/rajasthani-3/thumb.jpg"
-  },
-  {
-   "id": "abstract-1",
-   "category": "abstract",
-   "title": "Flame Geometry",
-   "description": "Overlapping orbs resolve into an abstract diya.",
-   "medium": "Acrylic & gold leaf",
-   "albedo": "/paintings/abstract-1/albedo.jpg",
-   "height": "/paintings/abstract-1/height.jpg",
-   "preview": "/paintings/abstract-1/preview.jpg",
-   "thumb": "/paintings/abstract-1/thumb.jpg"
-  },
-  {
-   "id": "abstract-2",
-   "category": "abstract",
-   "title": "Celebration in Colour",
-   "description": "Gestural sweeps of festival colour and gilt.",
-   "medium": "Mixed media",
-   "albedo": "/paintings/abstract-2/albedo.jpg",
-   "height": "/paintings/abstract-2/height.jpg",
-   "preview": "/paintings/abstract-2/preview.jpg",
-   "thumb": "/paintings/abstract-2/thumb.jpg"
-  },
-  {
-   "id": "abstract-3",
-   "category": "abstract",
-   "title": "Night of a Thousand Lights",
-   "description": "A single line-drawn diya in a field of bokeh.",
-   "medium": "Oil on canvas",
-   "albedo": "/paintings/abstract-3/albedo.jpg",
-   "height": "/paintings/abstract-3/height.jpg",
-   "preview": "/paintings/abstract-3/preview.jpg",
-   "thumb": "/paintings/abstract-3/thumb.jpg"
-  },
-  {
-   "id": "folk-1",
-   "category": "folk",
-   "title": "Warli Diwali Dance",
-   "description": "Warli figures dance the tarpa around a central lamp.",
-   "medium": "Rice paste on earth-red (acrylic)",
-   "albedo": "/paintings/folk-1/albedo.jpg",
-   "height": "/paintings/folk-1/height.jpg",
-   "preview": "/paintings/folk-1/preview.jpg",
-   "thumb": "/paintings/folk-1/thumb.jpg"
-  },
-  {
-   "id": "folk-2",
-   "category": "folk",
-   "title": "Madhubani Deep",
-   "description": "A Madhubani-style lamp with fish, petals and bold borders.",
-   "medium": "Acrylic on canvas",
-   "albedo": "/paintings/folk-2/albedo.jpg",
-   "height": "/paintings/folk-2/height.jpg",
-   "preview": "/paintings/folk-2/preview.jpg",
-   "thumb": "/paintings/folk-2/thumb.jpg"
-  },
-  {
-   "id": "folk-3",
-   "category": "folk",
-   "title": "Gond Tree of Light",
-   "description": "A Gond-style tree bearing diyas as fruit.",
-   "medium": "Acrylic on canvas",
-   "albedo": "/paintings/folk-3/albedo.jpg",
-   "height": "/paintings/folk-3/height.jpg",
-   "preview": "/paintings/folk-3/preview.jpg",
-   "thumb": "/paintings/folk-3/thumb.jpg"
-  },
-  {
-   "id": "gold-1",
-   "category": "gold",
-   "title": "Golden Mandala",
-   "description": "An intricate gold mandala on midnight black.",
-   "medium": "Gold leaf on canvas",
-   "albedo": "/paintings/gold-1/albedo.jpg",
-   "height": "/paintings/gold-1/height.jpg",
-   "preview": "/paintings/gold-1/preview.jpg",
-   "thumb": "/paintings/gold-1/thumb.jpg"
-  },
-  {
-   "id": "gold-2",
-   "category": "gold",
-   "title": "Emerald & Gold Diyas",
-   "description": "Gilded diyas on emerald with a paisley border.",
-   "medium": "Gold leaf & acrylic",
-   "albedo": "/paintings/gold-2/albedo.jpg",
-   "height": "/paintings/gold-2/height.jpg",
-   "preview": "/paintings/gold-2/preview.jpg",
-   "thumb": "/paintings/gold-2/thumb.jpg"
-  },
-  {
-   "id": "gold-3",
-   "category": "gold",
-   "title": "Gilded Lotus",
-   "description": "A gold-leaf lotus and Om over crimson-black.",
-   "medium": "Gold leaf & oil",
-   "albedo": "/paintings/gold-3/albedo.jpg",
-   "height": "/paintings/gold-3/height.jpg",
-   "preview": "/paintings/gold-3/preview.jpg",
-   "thumb": "/paintings/gold-3/thumb.jpg"
+   "thumb": "/paintings/rajasthani-3/thumb.jpg",
+   "fx": "/paintings/rajasthani-3/fx.png",
+   "motion": "/paintings/rajasthani-3/motion.png",
+   "anim": "/paintings/rajasthani-3/anim.json"
   }
  ]
 }
