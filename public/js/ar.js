@@ -331,7 +331,7 @@ export class ARSession {
   /** Optional pre-rendered animated version (e.g. image-to-video clip). Its first frame must be
    *  the painting; it is cross-faded in only once it is actually playing (no loading flash). */
   _setupVideo(painting) {
-    if (this.videoEl) { this.videoEl.pause(); this.videoEl.removeAttribute('src'); this.videoEl.load(); this.videoEl = null; }
+    if (this.videoEl) { this.videoEl.pause(); this.videoEl.removeAttribute('src'); this.videoEl.load(); this.videoEl.remove(); this.videoEl = null; }
     if (this.videoTex) { this.videoTex.dispose(); this.videoTex = null; }
     this.material.uniforms.videoMix.value = 0;
     this.videoReady = false;
@@ -339,12 +339,17 @@ export class ARSession {
     const v = document.createElement('video');
     Object.assign(v, { muted: true, loop: true, playsInline: true, preload: 'auto', crossOrigin: 'anonymous' });
     v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+    // kept in the page (invisible) so every mobile browser decodes it for the texture
+    v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none;z-index:-1';
     v.src = painting.video;
     v.addEventListener('playing', () => { this.videoReady = true; }, { once: false });
     this.videoEl = v;
+    document.body.appendChild(v);
     this.videoTex = new THREE.VideoTexture(v);
-    this.videoTex.colorSpace = THREE.SRGBColorSpace;
+    this.videoTex.colorSpace = THREE.NoColorSpace;   // decoded sRGB→linear in the shader (see paintingMaterial)
     this.material.uniforms.videoMap.value = this.videoTex;
+    // warm up: download + start the decoder now, so "Bring to Life" starts instantly; rest on frame 0
+    v.play().then(() => { if (this.videoEl === v && !this.animOn) { v.pause(); v.currentTime = 0; } }).catch(() => {});
   }
 
   setAnimating(on) {
@@ -464,7 +469,7 @@ export class ARSession {
     if (u.uAnim.value > 0) u.animTime.value += dt; else u.animTime.value = 0;
     if (this.videoEl) {
       const want = this.animOn && this.videoReady ? 1 : 0;
-      u.videoMix.value += (want - u.videoMix.value) * Math.min(1, dt * 3);
+      u.videoMix.value += (want - u.videoMix.value) * Math.min(1, dt * 6);
       if (!this.animOn && u.videoMix.value < 0.01 && !this.videoEl.paused) this.videoEl.pause();
     }
     if (this.targetSeen) this._lastPose = (this._lastPose || new THREE.Matrix4()).copy(this.anchor.group.matrix);
@@ -512,7 +517,7 @@ export class ARSession {
     try { this.mindar?.video?.remove(); if (this.mindar) this.mindar.video = null; } catch {}
     try {
       this.material?.dispose(); this.mesh?.geometry.dispose(); this.fx?.dispose();
-      if (this.videoEl) { this.videoEl.pause(); this.videoEl = null; }
+      if (this.videoEl) { this.videoEl.pause(); this.videoEl.remove(); this.videoEl = null; }
       this.renderer?.dispose();
       this.renderer?.domElement.remove();
       this.mindar?.cssRenderer?.domElement.remove();

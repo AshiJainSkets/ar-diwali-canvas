@@ -46,6 +46,19 @@ PLANS = {
     'skets-6': dict(
         add=[('sway', 165, 0, 285, 620, 0.6), ('sway', 1035, 0, 1100, 420, 0.6), ('petals', 110, 780, 90, MARIGOLD), ('petals', 1460, 830, 80, MARIGOLD)],
         protect=[(365, 375, 1405, 1200), (300, 40, 1000, 140)]),   # team + SKETStudio/AIA26 text
+    # Traditional: no GIF supplied for this one, so it gets a hand-placed plan (the source is very
+    # small, so automatic light detection is switched off — it mistakes the bright wall for lights).
+    'trad-ganesh-puja': dict(
+        detect=False,
+        add=[('bulb', x, 228 - 30 * (1 - ((x - 390) / 120) ** 2), 5, i / 7) for i, x in enumerate(range(285, 500, 30))]
+            + [('bulb', x, 296 + 10 * (1 - ((x - 715) / 75) ** 2), 4, i / 7) for i, x in enumerate(range(640, 800, 22))]
+            + [('flame', 673, 775, 20), ('flame', 727, 840, 22), ('flame', 660, 893, 20),
+               ('flame', 513, 965, 13), ('flame', 593, 978, 13),   # h < 14: no embers rising past Ganesha
+               ('glow', 690, 870, 110),
+               ('sway', 560, 100, 940, 290, 0.6), ('sway', 255, 190, 530, 430, 0.6), ('sway', 945, 160, 1090, 330, 0.4),
+               ('petals', 985, 985, 80, MARIGOLD), ('petals', 450, 1030, 90, MARIGOLD)]
+            + sparkle(780, 950, 90, 48, 18, 71, r=4),
+        protect=[(285, 430, 625, 905), (855, 330, 1190, 955)]),   # Lord Ganesha + family
 }
 
 
@@ -94,7 +107,7 @@ def build(pid):
         faces = [] if cc.empty() else cc.detectMultiScale(g, 1.1, 5, minSize=(18, 18))  # optional; manual rects always apply
         for (x, y, w, h) in faces:
             plan['protect'] = list(plan['protect']) + [(x - w * 0.4, y - h * 0.5, x + w * 1.4, y + h * 1.6)]
-    lights = detect_lights(img, plan['protect'])
+    lights = detect_lights(img, plan['protect']) if plan.get('detect', True) else []
     anchors = lights + plan['add']
     anim = fxmaps.build(d, anchors, plan['protect'], seed=sum(map(ord, pid)))
     return lights, anim

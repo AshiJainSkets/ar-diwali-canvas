@@ -11,9 +11,7 @@ CATEGORIES = [
     ('rangoli', 'Diwali Rangoli Art', 'Intricate powder rangolis: mandala, lotus, peacock, diya and geometric designs.'),
     ('flower-rangoli', 'Original Flower Rangolis', 'Real marigold, rose, jasmine and lotus petal arrangements.'),
     ('divine', 'Gods & Divine Art', 'Goddess Lakshmi and Lord Ganesha in light and devotion.'),
-    ('diya', 'Diya & Floral Decorations', 'Clay lamps, marigolds and flowing petals.'),
     ('heritage', 'Indian Heritage Diwali', 'Ghats, temples and forts aglow.'),
-    ('rajasthani', 'Royal Rajasthani Diwali', 'Palaces, jharokhas and caparisoned elephants.'),
 ]
 PAL_FESTIVE = ['#e63946', '#f4a261', '#ffd166', '#2a9d8f', '#7b2cbf', '#ef476f']
 

@@ -67,6 +67,8 @@ Particles fade out before getting close to the phone.
 
 Each painting folder holds its animation assets: `fx.png` (lights and flames), `motion.png` (sway, ripple and swing masks) and `anim.json` (3D effects and halos). An optional `animated.mp4` (a pre-rendered clip whose first frame is the painting) is cross-faded in automatically when present.
 
+Paintings that come with their own GIF: put `name.png` + `name.gif` in `tools/paintings/source-animated/`, add a line to `ITEMS` in `tools/paintings/import_animated.py`, then run it and `assemble_catalog.py`. Only the pixels the GIF actually animates are used (still + GIF motion), so frame 0 equals the painting and people are never altered.
+
 | Build step | Command |
 |---|---|
 | Procedural paintings' animations | `python tools/paintings/build_animations.py` |

@@ -24,7 +24,7 @@ def main():
     old = json.load(open(cp)) if os.path.exists(cp) else {'paintings': []}
     generated = {p[0] for p in PAINTINGS} | {r[0] for r in RANGOLIS}
     cats = [c for c, _, _ in CATEGORIES]
-    paintings = [entry(*p[:5]) for p in PAINTINGS] + [entry(*r[:5]) for r in RANGOLIS]
+    paintings = [entry(*p[:5]) for p in PAINTINGS + RANGOLIS if p[1] in cats]  # removed categories are dropped
     REPLACED = {'rangoli-1', 'rangoli-2', 'rangoli-3'}  # old basic rangolis, replaced by the premium set
     paintings += [p for p in old['paintings'] if p['id'] not in generated and p['id'] not in REPLACED
                   and p['category'] in cats and os.path.exists(os.path.join(OUT, p['id'], 'albedo.jpg'))]  # imported art

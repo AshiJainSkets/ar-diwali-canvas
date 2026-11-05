@@ -28,19 +28,9 @@
    "description": "Goddess Lakshmi and Lord Ganesha in light and devotion."
   },
   {
-   "id": "diya",
-   "name": "Diya & Floral Decorations",
-   "description": "Clay lamps, marigolds and flowing petals."
-  },
-  {
    "id": "heritage",
    "name": "Indian Heritage Diwali",
    "description": "Ghats, temples and forts aglow."
-  },
-  {
-   "id": "rajasthani",
-   "name": "Royal Rajasthani Diwali",
-   "description": "Palaces, jharokhas and caparisoned elephants."
   }
  ],
  "paintings": [
@@ -169,6 +159,96 @@
    "fx": "/paintings/traditional-3/fx.png",
    "motion": "/paintings/traditional-3/motion.png",
    "anim": "/paintings/traditional-3/anim.json"
+  },
+  {
+   "id": "trad-ganesh-puja",
+   "category": "traditional",
+   "title": "Family Ganesh Puja at Home",
+   "description": "A family prays before Lord Ganesha among glowing diyas, marigolds and a festive rangoli.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-ganesh-puja/albedo.jpg",
+   "height": "/paintings/trad-ganesh-puja/height.jpg",
+   "preview": "/paintings/trad-ganesh-puja/preview.jpg",
+   "thumb": "/paintings/trad-ganesh-puja/thumb.jpg",
+   "fx": "/paintings/trad-ganesh-puja/fx.png",
+   "motion": "/paintings/trad-ganesh-puja/motion.png",
+   "anim": "/paintings/trad-ganesh-puja/anim.json",
+   "video": "/paintings/trad-ganesh-puja/animated.mp4"
+  },
+  {
+   "id": "trad-kids-rangoli",
+   "category": "traditional",
+   "title": "Rangoli & Fuljhadi on the Doorstep",
+   "description": "A girl lights diyas around a rangoli while her brother twirls a fuljhadi under fireworks.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-kids-rangoli/albedo.jpg",
+   "height": "/paintings/trad-kids-rangoli/height.jpg",
+   "preview": "/paintings/trad-kids-rangoli/preview.jpg",
+   "thumb": "/paintings/trad-kids-rangoli/thumb.jpg",
+   "fx": "/paintings/trad-kids-rangoli/fx.png",
+   "motion": "/paintings/trad-kids-rangoli/motion.png",
+   "anim": "/paintings/trad-kids-rangoli/anim.json",
+   "video": "/paintings/trad-kids-rangoli/animated.mp4"
+  },
+  {
+   "id": "trad-family-home",
+   "category": "traditional",
+   "title": "Festival of Lights at Home",
+   "description": "Family and neighbours gather at a home strung with lights as fireworks bloom overhead.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-family-home/albedo.jpg",
+   "height": "/paintings/trad-family-home/height.jpg",
+   "preview": "/paintings/trad-family-home/preview.jpg",
+   "thumb": "/paintings/trad-family-home/thumb.jpg",
+   "fx": "/paintings/trad-family-home/fx.png",
+   "motion": "/paintings/trad-family-home/motion.png",
+   "anim": "/paintings/trad-family-home/anim.json",
+   "video": "/paintings/trad-family-home/animated.mp4"
+  },
+  {
+   "id": "trad-lighting-diyas",
+   "category": "traditional",
+   "title": "Lighting the Evening Diyas",
+   "description": "A mother and her daughters light diyas on the terrace at dusk.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-lighting-diyas/albedo.jpg",
+   "height": "/paintings/trad-lighting-diyas/height.jpg",
+   "preview": "/paintings/trad-lighting-diyas/preview.jpg",
+   "thumb": "/paintings/trad-lighting-diyas/thumb.jpg",
+   "fx": "/paintings/trad-lighting-diyas/fx.png",
+   "motion": "/paintings/trad-lighting-diyas/motion.png",
+   "anim": "/paintings/trad-lighting-diyas/anim.json",
+   "video": "/paintings/trad-lighting-diyas/animated.mp4"
+  },
+  {
+   "id": "trad-glowing-diya",
+   "category": "traditional",
+   "title": "The Radiant Diya",
+   "description": "A single clay diya glowing against a sky of festive colour.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-glowing-diya/albedo.jpg",
+   "height": "/paintings/trad-glowing-diya/height.jpg",
+   "preview": "/paintings/trad-glowing-diya/preview.jpg",
+   "thumb": "/paintings/trad-glowing-diya/thumb.jpg",
+   "fx": "/paintings/trad-glowing-diya/fx.png",
+   "motion": "/paintings/trad-glowing-diya/motion.png",
+   "anim": "/paintings/trad-glowing-diya/anim.json",
+   "video": "/paintings/trad-glowing-diya/animated.mp4"
+  },
+  {
+   "id": "trad-diyas-by-pond",
+   "category": "traditional",
+   "title": "Diyas by the Pond",
+   "description": "A family arranges a platter of diyas and flowers beside a lamp-lit pond.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-diyas-by-pond/albedo.jpg",
+   "height": "/paintings/trad-diyas-by-pond/height.jpg",
+   "preview": "/paintings/trad-diyas-by-pond/preview.jpg",
+   "thumb": "/paintings/trad-diyas-by-pond/thumb.jpg",
+   "fx": "/paintings/trad-diyas-by-pond/fx.png",
+   "motion": "/paintings/trad-diyas-by-pond/motion.png",
+   "anim": "/paintings/trad-diyas-by-pond/anim.json",
+   "video": "/paintings/trad-diyas-by-pond/animated.mp4"
   },
   {
    "id": "rangoli-mandala",
@@ -381,48 +461,6 @@
    "anim": "/paintings/ganesha-3/anim.json"
   },
   {
-   "id": "diya-1",
-   "category": "diya",
-   "title": "Row of Light",
-   "description": "Nine clay diyas on a ledge strewn with marigold petals.",
-   "medium": "Oil on canvas",
-   "albedo": "/paintings/diya-1/albedo.jpg",
-   "height": "/paintings/diya-1/height.jpg",
-   "preview": "/paintings/diya-1/preview.jpg",
-   "thumb": "/paintings/diya-1/thumb.jpg",
-   "fx": "/paintings/diya-1/fx.png",
-   "motion": "/paintings/diya-1/motion.png",
-   "anim": "/paintings/diya-1/anim.json"
-  },
-  {
-   "id": "diya-2",
-   "category": "diya",
-   "title": "Floating Diyas",
-   "description": "Lamps and lotuses drifting on a twilight river.",
-   "medium": "Acrylic on canvas",
-   "albedo": "/paintings/diya-2/albedo.jpg",
-   "height": "/paintings/diya-2/height.jpg",
-   "preview": "/paintings/diya-2/preview.jpg",
-   "thumb": "/paintings/diya-2/thumb.jpg",
-   "fx": "/paintings/diya-2/fx.png",
-   "motion": "/paintings/diya-2/motion.png",
-   "anim": "/paintings/diya-2/anim.json"
-  },
-  {
-   "id": "diya-3",
-   "category": "diya",
-   "title": "Marigold & Flame",
-   "description": "A brass diya crowned by heavy marigold garlands.",
-   "medium": "Impasto oil",
-   "albedo": "/paintings/diya-3/albedo.jpg",
-   "height": "/paintings/diya-3/height.jpg",
-   "preview": "/paintings/diya-3/preview.jpg",
-   "thumb": "/paintings/diya-3/thumb.jpg",
-   "fx": "/paintings/diya-3/fx.png",
-   "motion": "/paintings/diya-3/motion.png",
-   "anim": "/paintings/diya-3/anim.json"
-  },
-  {
    "id": "heritage-1",
    "category": "heritage",
    "title": "Ghats of Light",
@@ -463,48 +501,6 @@
    "fx": "/paintings/heritage-3/fx.png",
    "motion": "/paintings/heritage-3/motion.png",
    "anim": "/paintings/heritage-3/anim.json"
-  },
-  {
-   "id": "rajasthani-1",
-   "category": "rajasthani",
-   "title": "Royal Elephant Procession",
-   "description": "Caparisoned elephants before pink-city arches.",
-   "medium": "Gouache-style acrylic",
-   "albedo": "/paintings/rajasthani-1/albedo.jpg",
-   "height": "/paintings/rajasthani-1/height.jpg",
-   "preview": "/paintings/rajasthani-1/preview.jpg",
-   "thumb": "/paintings/rajasthani-1/thumb.jpg",
-   "fx": "/paintings/rajasthani-1/fx.png",
-   "motion": "/paintings/rajasthani-1/motion.png",
-   "anim": "/paintings/rajasthani-1/anim.json"
-  },
-  {
-   "id": "rajasthani-2",
-   "category": "rajasthani",
-   "title": "Jharokha Lights",
-   "description": "Sandstone jharokhas, each holding a single flame.",
-   "medium": "Textured acrylic",
-   "albedo": "/paintings/rajasthani-2/albedo.jpg",
-   "height": "/paintings/rajasthani-2/height.jpg",
-   "preview": "/paintings/rajasthani-2/preview.jpg",
-   "thumb": "/paintings/rajasthani-2/thumb.jpg",
-   "fx": "/paintings/rajasthani-2/fx.png",
-   "motion": "/paintings/rajasthani-2/motion.png",
-   "anim": "/paintings/rajasthani-2/anim.json"
-  },
-  {
-   "id": "rajasthani-3",
-   "category": "rajasthani",
-   "title": "Peacock Palace Night",
-   "description": "A peacock dances beneath chhatris and star lanterns.",
-   "medium": "Oil on canvas",
-   "albedo": "/paintings/rajasthani-3/albedo.jpg",
-   "height": "/paintings/rajasthani-3/height.jpg",
-   "preview": "/paintings/rajasthani-3/preview.jpg",
-   "thumb": "/paintings/rajasthani-3/thumb.jpg",
-   "fx": "/paintings/rajasthani-3/fx.png",
-   "motion": "/paintings/rajasthani-3/motion.png",
-   "anim": "/paintings/rajasthani-3/anim.json"
   }
  ]
 }

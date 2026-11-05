@@ -159,7 +159,12 @@ const frag = /* glsl */ `
     vec4 ca = texture2D(mapA, vUv, mipBias);
     vec4 cb = texture2D(mapB, uv, mipBias);
     if (hw.z > 0.001) cb.rgb = mix(cb.rgb, texture2D(mapB, hw.xy, mipBias).rgb, hw.z);
-    if (videoMix > 0.001) cb.rgb = mix(cb.rgb, texture2D(videoMap, vUv).rgb, videoMix);
+    if (videoMix > 0.001) {
+      // video frames arrive as raw sRGB (VideoTexture is not hardware-decoded here) → linear, like the albedo
+      vec3 vs = texture2D(videoMap, vUv).rgb;
+      vec3 vl = mix(vs / 12.92, pow((vs + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), vs));
+      cb.rgb = mix(cb.rgb, vl, videoMix);
+    }
     vec3 albedo = mix(ca.rgb, cb.rgb, mixB);
     vec3 nA = impastoNormal(heightA, vUv, texelA);
     vec3 nB = impastoNormal(heightB, vUv, texelB);
