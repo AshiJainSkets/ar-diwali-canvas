@@ -124,3 +124,53 @@ export class OneEuro {
     return this.x;
   }
 }
+
+/**
+ * Corner stabiliser: keeps the painting still on a still canvas, follows it quickly when it moves.
+ *
+ * Why: per-frame tracking measurements are noisy (single-frame spikes of several % of the canvas,
+ * even with the phone held still). A One-Euro filter reads that noise as speed and opens up, so the
+ * painting shivers. Here:
+ *   1. a running median over the last few *new* measurements removes one-frame spikes;
+ *   2. while the measured corners stay within a small dead zone of the shown position (relative to
+ *      the canvas size), the painting is held almost locked (very slow drift correction);
+ *   3. beyond the dead zone (real hand / phone movement) it switches smoothly to fast following,
+ *      and settles back onto the measurement before locking again (hysteresis).
+ */
+export class CornerStabilizer {
+  constructor(opts = {}) { this.configure(opts); this.reset(); }
+  configure({ deadzone = 0.01, still = 0.25, move = 9, window = 3 } = {}) {
+    Object.assign(this, { deadzone, still, move, window });
+  }
+  reset() { this.win = []; this.target = null; this.x = null; this.t = 0; this.moving = false; this.last = null; }
+  /** Add a new measurement (8 numbers: x0,y0,…,x3,y3). Identical repeats are ignored. */
+  push(v) {
+    if (this.last && v.every((a, i) => Math.abs(a - this.last[i]) < 1e-6)) return;
+    this.last = v.slice();
+    this.win.push(v.slice());
+    if (this.win.length > this.window) this.win.shift();
+    this.target = v.map((_, i) => median(this.win.map((w) => w[i])));
+  }
+  /** Advance the shown corners towards the measurement; call every rendered frame. */
+  update(t) {
+    if (!this.target) return this.x;
+    if (!this.x) { this.x = this.target.slice(); this.t = t; return this.x; }
+    const dt = Math.min(0.25, Math.max(0.001, t - this.t)); this.t = t;
+    const diag = Math.hypot(this.x[4] - this.x[0], this.x[5] - this.x[1]) || 1;
+    let dev = 0;
+    for (let i = 0; i < 8; i += 2) dev = Math.max(dev, Math.hypot(this.target[i] - this.x[i], this.target[i + 1] - this.x[i + 1]));
+    const r = dev / diag;
+    const dz = this.moving ? this.deadzone * 0.35 : this.deadzone;   // hysteresis: settle, then lock
+    const k = Math.min(1, Math.max(0, (r - dz) / (this.deadzone * 3)));
+    this.moving = k > 0.15 || (this.moving && r > dz);
+    const cutoff = this.still + (this.move - this.still) * Math.sqrt(k);
+    const a = OneEuro.alpha(dt, cutoff);
+    for (let i = 0; i < 8; i++) this.x[i] += a * (this.target[i] - this.x[i]);
+    return this.x;
+  }
+}
+
+function median(a) {
+  const s = a.slice().sort((p, q) => p - q), m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}

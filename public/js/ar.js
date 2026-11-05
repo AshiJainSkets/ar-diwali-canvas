@@ -12,14 +12,15 @@ import { MindARThree } from '/vendor/mindar/mindar-image-three.prod.js';
 import { createPaintingMaterial, loadPaintingTextures } from './paintingMaterial.js';
 import { LightEstimator } from './lightEstimator.js';
 import { LivingFx } from './fxLayer.js';
-import { fitHomographyRobust, homographyFrom4, apply, mul3, OneEuro } from './homography.js';
+import { fitHomographyRobust, homographyFrom4, apply, mul3, CornerStabilizer } from './homography.js';
 
 // mindar*: MindAR's internal pose filter (ms time base) — only used for the pose fallback.
-// euro*: our corner filter (Hz, px/s). warmup/miss: frames before showing / hiding.
+// stab: corner stabiliser (dead zone as fraction of canvas diagonal, still / moving cutoff Hz).
+// warmup/miss: frames before showing / hiding.
 export const TRACKING_PRESETS = {
-  stable: { mindarMinCF: 0.0005, mindarBeta: 0.01, euroMin: 0.45, euroBeta: 0.008, warmup: 6, miss: 10 },
-  balanced: { mindarMinCF: 0.001, mindarBeta: 0.05, euroMin: 0.9, euroBeta: 0.02, warmup: 4, miss: 7 },
-  responsive: { mindarMinCF: 0.001, mindarBeta: 1, euroMin: 1.8, euroBeta: 0.05, warmup: 3, miss: 5 },
+  stable: { mindarMinCF: 0.0005, mindarBeta: 0.01, stab: { deadzone: 0.014, still: 0.15, move: 7 }, warmup: 6, miss: 10 },
+  balanced: { mindarMinCF: 0.001, mindarBeta: 0.05, stab: { deadzone: 0.01, still: 0.25, move: 9 }, warmup: 4, miss: 7 },
+  responsive: { mindarMinCF: 0.001, mindarBeta: 1, stab: { deadzone: 0.006, still: 0.5, move: 12 }, warmup: 3, miss: 5 },
 };
 
 export class CameraError extends Error {
@@ -82,13 +83,14 @@ export class ARSession {
     this.state = 'idle';
     this.preset = TRACKING_PRESETS[this.cfg.tracking] || TRACKING_PRESETS.balanced;
     this.light = new LightEstimator();
-    this.euro = new OneEuro(this.preset.euroMin, this.preset.euroBeta);
+    this.euro = new CornerStabilizer(this.preset.stab);
     this.targetSeen = false;
     this.lostAt = -1e9;
     this.opacity = 0;
     this.reveal = { from: 0, to: 0, t0: 0, dur: 1 };
     this.currentPaintingId = null;
     this.meas = null;          // latest homography measurement {H, t, n, rms}
+    this.pool = []; this.poolH = null; this.poolT = 0;   // pooled matches while the phone is still
     this.Hs = null;            // smoothed target→video homography
     this.stats = { hFrames: 0, poseFrames: 0, lastRms: 0, lastInliers: 0 };
     this._v3 = new THREE.Vector3();
@@ -188,8 +190,27 @@ export class ARSession {
         const n = r.worldCoords.length;
         const rotated = this.video && (this.video.videoWidth !== ctl.inputWidth);
         if (n >= 8 && !rotated) {
-          const fit = fitHomographyRobust(r.worldCoords, r.screenCoords, { minInliers: 8, thresholdPx: 3 });
-          if (fit && fit.rms < 4) this.meas = { H: fit.H, t: performance.now(), n: fit.inliers, rms: fit.rms };
+          // Each update matches only ~10 points, so a single-frame fit swings the far corners by
+          // several px even on a still phone. While the phone is still, pool the matches of the
+          // last few updates into one fit (≈8× the points). Stillness test: this frame's points must
+          // agree (median residual < 2 px) with the previous pooled fit; any real movement fails
+          // the test and the pool restarts from this frame, so following stays immediate.
+          const now = performance.now();
+          const fr = { t: now, w: r.worldCoords.map((p) => ({ x: p.x, y: p.y })), s: r.screenCoords.map((p) => ({ x: p.x, y: p.y })) };
+          let still = false;
+          if (this.poolH && now - this.poolT < 400) {
+            const res = fr.w.map((p, i) => { const q = apply(this.poolH, p); return Math.hypot(q.x - fr.s[i].x, q.y - fr.s[i].y); }).sort((a, b) => a - b);
+            still = res[res.length >> 1] < 2.0;
+          }
+          if (!still) { if (this.pool.length) this.stats.poolResets = (this.stats.poolResets || 0) + 1; this.pool = []; }
+          this.pool.push(fr);
+          while (this.pool.length > 24 || now - this.pool[0].t > 2000) this.pool.shift();
+          const W = this.pool.flatMap((f) => f.w), S = this.pool.flatMap((f) => f.s);
+          const fit = fitHomographyRobust(W, S, { minInliers: 8, thresholdPx: 3 });
+          if (fit && fit.rms < 4) {
+            this.meas = { H: fit.H, t: now, n: fit.inliers, rms: fit.rms, pooled: this.pool.length };
+            this.poolH = fit.H; this.poolT = now;
+          } else { this.pool = []; this.poolH = null; }
           if (fit) { this.stats.lastRms = fit.rms; this.stats.lastInliers = fit.inliers; }
         }
       } catch (e) { /* never break tracking */ }
@@ -241,7 +262,7 @@ export class ARSession {
   setTracking(name) {
     this.cfg.tracking = name;
     this.preset = TRACKING_PRESETS[name] || TRACKING_PRESETS.balanced;
-    this.euro.minCutoff = this.preset.euroMin; this.euro.beta = this.preset.euroBeta;
+    this.euro.configure(this.preset.stab);
     const ctl = this.mindar?.controller;
     if (ctl) {
       ctl.filterMinCF = this.preset.mindarMinCF; ctl.filterBeta = this.preset.mindarBeta;
@@ -388,7 +409,7 @@ export class ARSession {
     if (!ctl) return;
     ctl.stopProcessVideo();
     this.targetSeen = false;
-    this.Hs = null; this.meas = null; this.euro.reset();
+    this.Hs = null; this.meas = null; this.pool = []; this.poolH = null; this.euro.reset();
     this.opacity = 0;
     this._setState('scanning');
     this._scanStart = performance.now();
@@ -415,7 +436,8 @@ export class ARSession {
       }
       if (raw) this.stats.hFrames++; else this.stats.poseFrames++;
       raw = raw || pose;
-      const f = this.euro.filter(raw.flatMap((p) => [p.x, p.y]), now / 1000);
+      this.euro.push(raw.flatMap((p) => [p.x, p.y]));
+      const f = this.euro.update(now / 1000);
       const sm = [0, 1, 2, 3].map((i) => ({ x: f[2 * i], y: f[2 * i + 1] }));
       this.Hs = homographyFrom4(this.targetPx.corners, sm) || this.Hs;
       this.smoothCorners = sm;
