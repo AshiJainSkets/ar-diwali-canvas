@@ -159,10 +159,23 @@ def main(only=None):
 #     for example, adds lights onto the saree that are not in the painting; those are rejected);
 #   • inside the other protected rectangles (small background figures) the GIF is used only where
 #     the original painting already has a light (string lights / diyas passing behind someone).
+G = 1600 / 724   # GIF px (724×543) → canvas px
 EXISTING = {
-    # id: (gif, gif→canvas offset in GIF px (dx, dy) measured by phase correlation)
-    'skets-2': ('skets-2.gif', (-0.51, 0.01)),
-    'skets-3': ('skets-3.gif', (-0.50, 0.01)),
+    # id → gif, offset (GIF px, measured by sub-pixel search: 0 for all so far), protection
+    'skets-2': dict(gif='skets-2.gif', offset=(0, 0), person=True),
+    'skets-3': dict(gif='skets-3.gif', offset=(0, 0), person=True),
+    # new paintings supplied as still + GIF (4:3, fills the canvas). `faces` are always kept
+    # exactly as the painting (GIF sparkles passing over a deity's face are not shown there).
+    'trad-lakshmi-ganesha': dict(
+        gif='lakshmi-ganesha.gif', still='lakshmi-ganesha.png', offset=(0, 0),
+        faces=[(188, 40, 292, 200), (400, 40, 550, 252)],            # Lakshmi, Ganesha (GIF px)
+        title='Lakshmi & Ganesha Diwali Blessings',
+        desc='Goddess Lakshmi on her lotus and Lord Ganesha bless the home with gold, light and prosperity.'),
+    'trad-family-sparklers': dict(
+        gif='family-sparklers.gif', still='family-sparklers.png', offset=(0, 0),
+        faces=[(90, 145, 190, 255), (232, 40, 362, 180), (338, 165, 422, 262), (428, 85, 548, 220)],
+        title='Sparklers with the Family',
+        desc='Mothers and children light fuljhadis around a bowl of glowing diyas under marigold garlands.'),
 }
 
 
@@ -184,8 +197,13 @@ def light_mask(bgr):
 
 def attach_gif(pid):
     import imported
-    gif, (dx, dy) = EXISTING[pid]
+    e = EXISTING[pid]
+    gif, (dx, dy) = e['gif'], e['offset']
     d = os.path.join(OUT, pid)
+    if e.get('still'):   # new painting: build the canvas image from the still first
+        os.makedirs(d, exist_ok=True)
+        still = np.asarray(Image.open(os.path.join(SRC, e['still'])).convert('RGB'))
+        save_static(d, fit_to_canvas(rgb2bgr(still), 'auto'))
     albedo = cv2.imread(os.path.join(d, 'albedo.jpg')).astype(np.float32)          # 1600×1200 BGR
     frames = [np.asarray(f.convert('RGB'))[..., ::-1].astype(np.float32) for f in ImageSequence.Iterator(Image.open(os.path.join(SRC, gif)))]
     gh, gw = frames[0].shape[:2]
@@ -198,10 +216,14 @@ def attach_gif(pid):
     M = np.float32([[s, 0, (0.5 + dx) * s - 0.5], [0, H / gh, (0.5 + dy) * (H / gh) - 0.5]])
     up = lambda a: cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     # protection multiplier on the canvas
-    person = (cv2.imread(os.path.join(SRC, f'{pid}-person.png'), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
+    person = np.zeros((H, W), np.uint8)
+    if e.get('person'):
+        person = (cv2.imread(os.path.join(SRC, f'{pid}-person.png'), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
+    for (x0, y0, x1, y1) in e.get('faces', []):
+        cv2.rectangle(person, (int(x0 * G), int(y0 * G)), (int(x1 * G), int(y1 * G)), 1, -1)
     person = cv2.GaussianBlur(cv2.dilate(person, np.ones((17, 17), np.uint8)).astype(np.float32), (0, 0), 4)
     P = np.zeros((H, W), np.float32)
-    for (x0, y0, x1, y1) in imported.PLANS[pid]['protect']:
+    for (x0, y0, x1, y1) in (imported.PLANS[pid]['protect'] if pid in imported.PLANS else []):
         cv2.rectangle(P, (int(x0), int(y0)), (int(x1), int(y1)), 1.0, -1)
     P = cv2.GaussianBlur(P, (0, 0), 6)
     allow = light_mask(albedo.astype(np.uint8))
@@ -233,8 +255,18 @@ def attach_gif(pid):
 
 if __name__ == '__main__':
     args = set(sys.argv[1:])
+    cat_path = os.path.join(OUT, 'catalog.json')
     for pid in [p for p in EXISTING if not args or p in args]:
         attach_gif(pid)
+        e = EXISTING[pid]
+        if e.get('still'):   # add / refresh its catalog entry (Traditional Diwali Celebration)
+            catalog = json.load(open(cat_path))
+            entry = {'id': pid, 'category': 'traditional', 'title': e['title'], 'description': e['desc'], 'medium': MEDIUM,
+                     **{k: f'/paintings/{pid}/{k}.jpg' for k in ('albedo', 'height', 'preview', 'thumb')}}
+            ids = [p['id'] for p in catalog['paintings']]
+            if pid in ids: catalog['paintings'][ids.index(pid)] = entry
+            else: catalog['paintings'].append(entry)
+            json.dump(catalog, open(cat_path, 'w'), indent=1, ensure_ascii=False)
     rest = {i[0] for i in ITEMS} & args if args else None
     if not args or rest:
         main(rest)

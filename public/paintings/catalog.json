@@ -253,6 +253,36 @@
    "video": "/paintings/trad-diyas-by-pond/animated.mp4"
   },
   {
+   "id": "trad-lakshmi-ganesha",
+   "category": "traditional",
+   "title": "Lakshmi & Ganesha Diwali Blessings",
+   "description": "Goddess Lakshmi on her lotus and Lord Ganesha bless the home with gold, light and prosperity.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-lakshmi-ganesha/albedo.jpg",
+   "height": "/paintings/trad-lakshmi-ganesha/height.jpg",
+   "preview": "/paintings/trad-lakshmi-ganesha/preview.jpg",
+   "thumb": "/paintings/trad-lakshmi-ganesha/thumb.jpg",
+   "fx": "/paintings/trad-lakshmi-ganesha/fx.png",
+   "motion": "/paintings/trad-lakshmi-ganesha/motion.png",
+   "anim": "/paintings/trad-lakshmi-ganesha/anim.json",
+   "video": "/paintings/trad-lakshmi-ganesha/animated.mp4"
+  },
+  {
+   "id": "trad-family-sparklers",
+   "category": "traditional",
+   "title": "Sparklers with the Family",
+   "description": "Mothers and children light fuljhadis around a bowl of glowing diyas under marigold garlands.",
+   "medium": "Animated painting",
+   "albedo": "/paintings/trad-family-sparklers/albedo.jpg",
+   "height": "/paintings/trad-family-sparklers/height.jpg",
+   "preview": "/paintings/trad-family-sparklers/preview.jpg",
+   "thumb": "/paintings/trad-family-sparklers/thumb.jpg",
+   "fx": "/paintings/trad-family-sparklers/fx.png",
+   "motion": "/paintings/trad-family-sparklers/motion.png",
+   "anim": "/paintings/trad-family-sparklers/anim.json",
+   "video": "/paintings/trad-family-sparklers/animated.mp4"
+  },
+  {
    "id": "rangoli-mandala",
    "category": "rangoli",
    "title": "Royal Mandala Rangoli",

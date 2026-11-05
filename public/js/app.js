@@ -115,6 +115,12 @@ function updateDock() {
 function selectPainting(id) {
   const p = state.paintings.find((x) => x.id === id);
   if (!p) return;
+  // a different painting starts static: "Bring to Life" switches off and must be tapped again
+  if (state.animating && p.id !== state.selected?.id) {
+    state.animating = false;
+    if (state.session) state.session.setAnimating(false);
+    setMagicButton(false);
+  }
   state.selected = p;
   store.set(`ardc:${canvasId}:painting`, p.id);
   $('#hero-img').src = p.preview;
